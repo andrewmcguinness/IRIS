@@ -4,7 +4,7 @@ package com.temenos.interaction.core.entity.vocabulary;
  * #%L
  * interaction-core
  * %%
- * Copyright (C) 2012 - 2013 Temenos Holdings N.V.
+ * Copyright (C) 2012 - 2014 Temenos Holdings N.V.
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,6 +30,7 @@ import com.temenos.interaction.core.entity.vocabulary.terms.TermListType;
 import com.temenos.interaction.core.entity.vocabulary.terms.TermMandatory;
 import com.temenos.interaction.core.entity.vocabulary.terms.TermRange;
 import com.temenos.interaction.core.entity.vocabulary.terms.TermResourceManager;
+import com.temenos.interaction.core.entity.vocabulary.terms.TermSemanticType;
 import com.temenos.interaction.core.entity.vocabulary.terms.TermValueType;
 
 /**
@@ -51,6 +52,9 @@ public class TermFactory {
 		}
 		else if(name.equalsIgnoreCase(TermValueType.TERM_NAME)) {
 			term = new TermValueType(value);
+		}
+		else if(name.equalsIgnoreCase(TermSemanticType.TERM_NAME)) {
+			term = new TermSemanticType(value);
 		}
 		else if(name.equalsIgnoreCase(TermMandatory.TERM_NAME)) {
 			term = new TermMandatory(value.equalsIgnoreCase("true"));
