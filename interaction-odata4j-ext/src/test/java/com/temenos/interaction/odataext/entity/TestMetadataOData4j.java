@@ -45,8 +45,8 @@ import org.odata4j.edm.EdmEntitySet;
 import org.odata4j.edm.EdmEntityType;
 import org.odata4j.edm.EdmNavigationProperty;
 import org.odata4j.edm.EdmProperty;
-import org.odata4j.edm.EdmSimpleType;
 import org.odata4j.edm.EdmProperty.CollectionKind;
+import org.odata4j.edm.EdmSimpleType;
 import org.odata4j.edm.EdmType;
 import org.odata4j.exceptions.NotFoundException;
 
@@ -621,4 +621,18 @@ public class TestMetadataOData4j {
 		thenThrow(new NotFoundException("EntitySet for entity type Dummy has not been found"));		
 		assertEquals(ees, mockMetadataOData4j.getEdmEntitySetByEntitySetName("Dummy"));
 	}
+	
+	@Test
+	public void testAirlineEntitySemanticTypes()
+	{	
+		EdmDataServices edmDataServices = metadataAirlineOdata4j.getMetadata();
+		
+		EdmType type = edmDataServices.findEdmEntityType(AIRLINE_NAMESPACE + ".Airport");
+		Assert.assertNotNull(type);
+		Assert.assertTrue(type instanceof EdmEntityType);
+		EdmEntityType entityType = (EdmEntityType) type;
+		Assert.assertEquals("Geography:Country", entityType.findProperty("country").findAnnotation("http://interaction.temenos.com/odata-extensions", "semanticType").getValue());
+	}
+
+
 }
