@@ -4,7 +4,7 @@ package com.temenos.interaction.odataext.entity;
  * #%L
  * interaction-odata4j-ext
  * %%
- * Copyright (C) 2012 - 2013 Temenos Holdings N.V.
+ * Copyright (C) 2012 - 2014 Temenos Holdings N.V.
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,6 +36,7 @@ import java.util.concurrent.ConcurrentMap;
 import javax.ws.rs.HttpMethod;
 
 import org.odata4j.core.ODataVersion;
+import org.odata4j.edm.EdmAnnotation;
 import org.odata4j.edm.EdmAssociation;
 import org.odata4j.edm.EdmAssociationEnd;
 import org.odata4j.edm.EdmComplexType;
@@ -61,6 +63,7 @@ import com.temenos.interaction.core.entity.vocabulary.terms.TermComplexGroup;
 import com.temenos.interaction.core.entity.vocabulary.terms.TermComplexType;
 import com.temenos.interaction.core.entity.vocabulary.terms.TermIdField;
 import com.temenos.interaction.core.entity.vocabulary.terms.TermListType;
+import com.temenos.interaction.core.entity.vocabulary.terms.TermSemanticType;
 import com.temenos.interaction.core.entity.vocabulary.terms.TermValueType;
 import com.temenos.interaction.core.hypermedia.CollectionResourceState;
 import com.temenos.interaction.core.hypermedia.ResourceState;
@@ -372,6 +375,14 @@ public class MetadataOData4j {
 				EdmProperty.Builder ep = EdmProperty.newBuilder(entityMetadata.getSimplePropertyName(propertyName)).
 						setType(edmType).
 						setNullable(isNullable);
+
+				// Add an annotation if a semantic type is defined for the property
+				List<EdmAnnotation<?>> annotations = new LinkedList<EdmAnnotation<?>>();
+				String semanticType = entityMetadata.getTermValue(propertyName, TermSemanticType.TERM_NAME);
+				if (semanticType != null)
+					annotations.add((EdmAnnotation.element(TermSemanticType.NAMESPACE, TermSemanticType.PREFIX, TermSemanticType.CSDL_NAME, String.class, semanticType)));
+				ep.setAnnotations(annotations);
+
 				if (termComplexGroup == null) {
 					// Property belongs to an Entity Type, simply add it 
 					bProperties.add(ep);
