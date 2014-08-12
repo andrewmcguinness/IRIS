@@ -4,7 +4,7 @@ package com.temenos.interaction.odataext.entity;
  * #%L
  * interaction-odata4j-ext
  * %%
- * Copyright (C) 2012 - 2013 Temenos Holdings N.V.
+ * Copyright (C) 2012 - 2014 Temenos Holdings N.V.
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -631,7 +631,7 @@ public class TestMetadataOData4j {
 		Assert.assertNotNull(type);
 		Assert.assertTrue(type instanceof EdmEntityType);
 		EdmEntityType entityType = (EdmEntityType) type;
-		Assert.assertEquals("Geography:Country", entityType.findProperty("country").findAnnotation("http://interaction.temenos.com/odata-extensions", "semanticType").getValue());
+		Assert.assertEquals("Geography:Country", entityType.findProperty("country").findAnnotation("http://iris.temenos.com/odata-extensions", "semanticType").getValue());
 	}
 
 

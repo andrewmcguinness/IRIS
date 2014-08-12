@@ -30,7 +30,7 @@ import com.temenos.interaction.core.entity.vocabulary.Term;
 public class TermSemanticType implements Term {
 	public final static String TERM_NAME = "TERM_SEMANTIC_TYPE";
 	
-	public static final String NAMESPACE = "http://interaction.temenos.com/odata-extensions";
+	public static final String NAMESPACE = "http://iris.temenos.com/odata-extensions";
 	public static final String PREFIX = "iris-ext";
 	public static final String CSDL_NAME = "semanticType";
 	
