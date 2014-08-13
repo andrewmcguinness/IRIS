@@ -31,6 +31,7 @@ import com.temenos.interaction.core.entity.vocabulary.TermFactory;
 import com.temenos.interaction.core.hypermedia.ResourceStateMachine;
 import com.temenos.interaction.odataext.entity.MetadataOData4j;
 
+// TODO what is this class even for???
 
 /**
  * This class provides EDM metadata for the current service.
