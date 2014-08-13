@@ -60,7 +60,9 @@
 			<Term Name="TERM_MANDATORY">true</Term>
 			<Term Name="TERM_ID_FIELD">true</Term>
 		</Property>
-		<Property Name="country" />
+		<Property Name="country">
+			<Term Name="TERM_SEMANTIC_TYPE">Geography:Country</Term>
+		</Property>
 	</Entity>
 	<Entity Name="Flight">
 		<Property Name="flightID">

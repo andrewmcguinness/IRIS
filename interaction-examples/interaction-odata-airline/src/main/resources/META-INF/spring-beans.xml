@@ -43,15 +43,16 @@
 	</bean>
 
 	<!-- Metadata -->	
-	<bean id="metadataManager" class="com.temenos.interaction.odataext.resource.ResourceMetadataManager">
+	<bean id="metadataManager" class="com.temenos.interaction.core.resource.ResourceMetadataManager">
         <constructor-arg ref="stateMachine" />
 	</bean>
 	<bean id="metadata" factory-bean="metadataManager" factory-method="getMetadata"/>
 
-	<!-- Odata4j Metadata -->
+	<!-- Odata4j Metadata Translator -->
 	<bean id="metadataOData4j" class="com.temenos.interaction.odataext.entity.MetadataOData4j">
         <constructor-arg ref="metadata" />
         <constructor-arg ref="stateMachine" />
+        <property name="odataVersion" value="V2"/>
     </bean>
     	
 	<!-- Import Resource manager context -->
