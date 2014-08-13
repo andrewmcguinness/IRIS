@@ -39,6 +39,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.odata4j.core.NamespacedAnnotation;
+import org.odata4j.edm.EdmAnnotationElement;
 import org.odata4j.edm.EdmAssociation;
 import org.odata4j.edm.EdmComplexType;
 import org.odata4j.edm.EdmDataServices;
@@ -728,7 +730,13 @@ public class TestMetadataOData4j {
 		Assert.assertNotNull(type);
 		Assert.assertTrue(type instanceof EdmEntityType);
 		EdmEntityType entityType = (EdmEntityType) type;
-		Assert.assertEquals("Geography:Country", entityType.findProperty("country").findAnnotation("http://iris.temenos.com/odata-extensions", "semanticType").getValue());
+		NamespacedAnnotation<?> ann = entityType.findProperty("country").findAnnotation("http://iris.temenos.com/odata-extensions", "semanticType");
+		Assert.assertEquals(EdmAnnotationElement.class, ann.getClass());
+		EdmAnnotationElement<String> annEl = (EdmAnnotationElement<String>)ann;
+		Assert.assertNotNull(annEl.getNamespace().getPrefix());
+		Assert.assertNotNull(annEl.getNamespace().getUri());
+		Assert.assertEquals("Geography:Country", ann.getValue());
+		System.out.println(metadataAirlineOdata4j);
 	}
 
 }
