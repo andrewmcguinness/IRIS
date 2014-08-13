@@ -142,7 +142,6 @@ public class MetadataOData4j {
 			edmDataServices = createOData4jMetadata(metadata, hypermediaEngine, serviceDocument);
 		}
 		logger.debug("Passing metadata using OData " + odataVersion);
-		logger.debug(toString());
 		return edmDataServices;
 	}
 
@@ -406,12 +405,14 @@ public class MetadataOData4j {
 						setType(edmType).
 						setNullable(isNullable);
 
-				// Add an annotation if a semantic type is defined for the property
-				List<EdmAnnotation<?>> annotations = new LinkedList<EdmAnnotation<?>>();
-				String semanticType = entityMetadata.getTermValue(propertyName, TermSemanticType.TERM_NAME);
-				if (semanticType != null)
-					annotations.add((EdmAnnotation.attribute(TermSemanticType.NAMESPACE, TermSemanticType.PREFIX, TermSemanticType.CSDL_NAME, semanticType)));
-				ep.setAnnotations(annotations);
+				if (odataVersion != ODataVersion.V1) {
+					// Add an annotation if a semantic type is defined for the property
+					List<EdmAnnotation<?>> annotations = new LinkedList<EdmAnnotation<?>>();
+					String semanticType = entityMetadata.getTermValue(propertyName, TermSemanticType.TERM_NAME);
+					if (semanticType != null)
+						annotations.add((EdmAnnotation.attribute(TermSemanticType.NAMESPACE, TermSemanticType.PREFIX, TermSemanticType.CSDL_NAME, semanticType)));
+					ep.setAnnotations(annotations);
+				}
 
 				if (termComplexGroup == null) {
 					// Property belongs to an Entity Type, simply add it 
