@@ -31,6 +31,7 @@ import org.joda.time.LocalTime;
 import org.junit.Assert;
 import org.junit.Test;
 import org.odata4j.consumer.ODataConsumer;
+import org.odata4j.core.NamespacedAnnotation;
 import org.odata4j.core.OEntity;
 import org.odata4j.core.OProperties;
 import org.odata4j.edm.EdmDataServices;
@@ -93,7 +94,26 @@ public class EdmTimeTemporalITCase {
 //						.findProperty("Passenger_address").getType()).findProperty("Passenger_street").getType().isSimple());
 	}
 	
+	@Test
+	public void testSemanticAnnotation() {
+		ODataConsumer consumer = ODataJerseyConsumer.newBuilder(ConfigurationHelper.getTestEndpointUri(Configuration.TEST_ENDPOINT_URI)).build();
+		boolean oldDump = ODataConsumer.dump.responseBody();
+		ODataConsumer.dump.responseBody(true);
+		
+		EdmDataServices metadata = consumer.getMetadata();
+
+		Assert.assertEquals(EdmSimpleType.STRING,
+				metadata.findEdmEntitySet("Airports").getType()
+						.findProperty("country").getType());
+		
+		NamespacedAnnotation<?> st = metadata.findEdmEntitySet("Airports").getType().findProperty("country").findAnnotation("http://iris.temenos.com/odata-extensions", "semanticType");
+		Assert.assertNotNull(st);
+		Assert.assertEquals("Geography:country", st.getValue());
+		
+		ODataConsumer.dump.responseBody(oldDump);
+	}
 	
+
 	@Test
 	/**
 	 *handling of Date fields with different @Temporal

@@ -31,6 +31,9 @@
   <logger name="com.temenos.interaction.core.hypermedia">
     <level value="DEBUG" />
   </logger>
+  <logger name="com.temenos.interaction.odataext">
+    <level value="DEBUG" />
+  </logger>
   <!-- Log debug information about resource interactions -->
   <logger name="com.temenos.interaction.core.rim">
     <level value="INFO" />
