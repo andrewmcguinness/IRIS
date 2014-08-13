@@ -24,6 +24,7 @@ package com.temenos.interaction.odataext.entity;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -36,6 +37,7 @@ import java.util.concurrent.ConcurrentMap;
 import javax.ws.rs.HttpMethod;
 
 import org.odata4j.core.ODataVersion;
+import org.odata4j.core.PrefixedNamespace;
 import org.odata4j.edm.EdmAnnotation;
 import org.odata4j.edm.EdmAssociation;
 import org.odata4j.edm.EdmAssociationEnd;
@@ -92,6 +94,7 @@ public class MetadataOData4j {
 	private ResourceStateMachine hypermediaEngine;
 	private ResourceState serviceDocument;
 	private String SERVICE_DOCUMENT = "ServiceDocument";
+	private ODataVersion odataVersion = ODataVersion.V1;
 
 	/**
 	 * Construct the odata metadata ({@link EdmDataServices}) by looking up a resource 
@@ -111,6 +114,23 @@ public class MetadataOData4j {
 	}
 
 	/**
+	 * @return the odataVersion
+	 */
+	public ODataVersion getOdataVersion() {
+		return odataVersion;
+	}
+
+	/**
+	 * Change the version of OData that will be used. OData V2 is needed to permit annotations
+	 * (used for Semantic Types)
+	 * @param odataVersion the odataVersion to set.
+	 */
+	public void setOdataVersion(ODataVersion odataVersion) {
+		logger.debug("Setting configed version to " + odataVersion);
+		this.odataVersion = odataVersion;
+	}
+
+	/**
 	 * Returns odata4j metadata
 	 * @return edmdataservices object
 	 */
@@ -118,6 +138,8 @@ public class MetadataOData4j {
 		if (edmDataServices == null) {
 			edmDataServices = createOData4jMetadata(metadata, hypermediaEngine, serviceDocument);
 		}
+		logger.debug("Passing metadata using OData " + odataVersion);
+		logger.debug(toString());
 		return edmDataServices;
 	}
 
@@ -224,6 +246,10 @@ public class MetadataOData4j {
 		String serviceName = metadata.getModelName();
 		String namespace = serviceName + Metadata.MODEL_SUFFIX;
 		Builder mdBuilder = EdmDataServices.newBuilder();
+		
+		if (odataVersion==ODataVersion.V2)
+			mdBuilder.addNamespaces(Collections.singletonList(new PrefixedNamespace(TermSemanticType.NAMESPACE, TermSemanticType.PREFIX)));
+		
 		List<EdmSchema.Builder> bSchemas = new ArrayList<EdmSchema.Builder>();
 		EdmSchema.Builder bSchema = new EdmSchema.Builder();
 		List<EdmEntityContainer.Builder> bEntityContainers = new ArrayList<EdmEntityContainer.Builder>();
@@ -346,7 +372,8 @@ public class MetadataOData4j {
 		bSchemas.add(bSchema);
 
 		mdBuilder.addSchemas(bSchemas);
-		mdBuilder.setVersion(ODataVersion.V1);
+		mdBuilder.setVersion(odataVersion);
+		logger.debug("Creating version " + odataVersion + " metadata");
 
 		//Build the EDM metadata
 		return mdBuilder.build();
@@ -646,5 +673,15 @@ public class MetadataOData4j {
 		if (entitySetName != null && !entitySetName.isEmpty())
 			return entitySetName.substring(0, entitySetName.length() -1);
 		return "";
+	}
+	
+	/**
+	 * XML representation for debugging
+	 */
+	@Override
+	public String toString() {
+		java.io.StringWriter wr = new java.io.StringWriter();
+		org.odata4j.format.xml.EdmxFormatWriter.write(edmDataServices, wr);
+		return wr.toString();
 	}
 }
