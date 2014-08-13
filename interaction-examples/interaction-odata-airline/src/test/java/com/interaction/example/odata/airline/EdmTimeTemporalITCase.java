@@ -108,7 +108,7 @@ public class EdmTimeTemporalITCase {
 		
 		NamespacedAnnotation<?> st = metadata.findEdmEntitySet("Airports").getType().findProperty("country").findAnnotation("http://iris.temenos.com/odata-extensions", "semanticType");
 		Assert.assertNotNull(st);
-		Assert.assertEquals("Geography:country", st.getValue());
+		Assert.assertEquals("Geography:Country", st.getValue());
 		
 		ODataConsumer.dump.responseBody(oldDump);
 	}
