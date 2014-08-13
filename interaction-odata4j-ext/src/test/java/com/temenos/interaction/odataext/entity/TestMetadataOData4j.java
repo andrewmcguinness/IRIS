@@ -39,7 +39,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.odata4j.core.NamespacedAnnotation;
-import org.odata4j.edm.EdmAnnotationElement;
+import org.odata4j.edm.EdmAnnotationAttribute;
 import org.odata4j.edm.EdmAssociation;
 import org.odata4j.edm.EdmComplexType;
 import org.odata4j.edm.EdmDataServices;
@@ -125,7 +125,7 @@ public class TestMetadataOData4j {
 		metadataCustomerNonExpandableModelOdata4j = new MetadataOData4j(complexMetadata, new ResourceStateMachine(new ResourceState("SD", "ServiceDocument", new ArrayList<Action>(), "/")));
 	}
 	
-	@Test(expected = AssertionError.class)
+	@Test(expected = RuntimeException.class)
 	public void testAssertIndividualInitialState() {
 		CollectionResourceState serviceRoot = new CollectionResourceState("SD", "ServiceDocument", new ArrayList<Action>(), "/");
 		ResourceStateMachine hypermediaEngine = new ResourceStateMachine(serviceRoot);
@@ -634,8 +634,8 @@ public class TestMetadataOData4j {
 		Assert.assertTrue(type instanceof EdmEntityType);
 		EdmEntityType entityType = (EdmEntityType) type;
 		NamespacedAnnotation<?> ann = entityType.findProperty("country").findAnnotation("http://iris.temenos.com/odata-extensions", "semanticType");
-		Assert.assertEquals(EdmAnnotationElement.class, ann.getClass());
-		EdmAnnotationElement<String> annEl = (EdmAnnotationElement<String>)ann;
+		Assert.assertEquals(EdmAnnotationAttribute.class, ann.getClass());
+		EdmAnnotationAttribute annEl = (EdmAnnotationAttribute)ann;
 		Assert.assertNotNull(annEl.getNamespace().getPrefix());
 		Assert.assertNotNull(annEl.getNamespace().getUri());
 		Assert.assertEquals("Geography:Country", ann.getValue());

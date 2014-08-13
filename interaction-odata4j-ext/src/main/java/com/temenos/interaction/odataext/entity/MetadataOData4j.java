@@ -96,7 +96,10 @@ public class MetadataOData4j {
 		serviceDocument = hypermediaEngine.getResourceStateByName("ServiceDocument");
 		if (serviceDocument == null)
 			throw new RuntimeException("No 'ServiceDocument' found.");
-		assert(!(serviceDocument instanceof CollectionResourceState)) : "Initial state must be an individual resource state";
+
+		if (serviceDocument instanceof CollectionResourceState)
+			throw new RuntimeException("Initial state must be an individual resource state");
+
 		this.metadata = metadata;
 		this.hypermediaEngine = hypermediaEngine;
 		this.edmEntitySetMap= new HashMap<String, EdmEntitySet>(); 
@@ -214,7 +217,7 @@ public class MetadataOData4j {
 					List<EdmAnnotation<?>> annotations = new LinkedList<EdmAnnotation<?>>();
 					String semanticType = entityMetadata.getTermValue(propertyName, TermSemanticType.TERM_NAME);
 					if (semanticType != null)
-						annotations.add((EdmAnnotation.element(TermSemanticType.NAMESPACE, TermSemanticType.PREFIX, TermSemanticType.CSDL_NAME, String.class, semanticType)));
+						annotations.add((EdmAnnotation.attribute(TermSemanticType.NAMESPACE, TermSemanticType.PREFIX, TermSemanticType.CSDL_NAME, semanticType)));
 					ep.setAnnotations(annotations);
 					
 					if (termComplexGroup == null) {
