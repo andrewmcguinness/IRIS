@@ -130,7 +130,6 @@ public class MetadataOData4j {
 		if (edmDataServices == null) {
 			edmDataServices = createOData4jMetadata(metadata, hypermediaEngine, serviceDocument);
 		}
-		logger.debug("Passing metadata using OData " + odataVersion);
 		return edmDataServices;
 	}
 
