@@ -40,6 +40,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.odata4j.core.NamespacedAnnotation;
+import org.odata4j.core.ODataVersion;
 import org.odata4j.edm.EdmAnnotationAttribute;
 import org.odata4j.edm.EdmAssociation;
 import org.odata4j.edm.EdmComplexType;
