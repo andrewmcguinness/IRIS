@@ -119,6 +119,7 @@ public class TestMetadataOData4j {
 		
 		//Convert metadata to odata4j metadata
 		metadataAirlineOdata4j = new MetadataOData4j(metadataAirline, hypermediaEngine);
+		metadataAirlineOdata4j.setOdataVersion(ODataVersion.V2);
 		
 		//Read the Complex metadata file
 		MetadataParser parserCustomerComplex = new MetadataParser();
@@ -736,7 +737,6 @@ public class TestMetadataOData4j {
 		Assert.assertNotNull(annEl.getNamespace().getPrefix());
 		Assert.assertNotNull(annEl.getNamespace().getUri());
 		Assert.assertEquals("Geography:Country", ann.getValue());
-		System.out.println(metadataAirlineOdata4j);
 	}
 
 }

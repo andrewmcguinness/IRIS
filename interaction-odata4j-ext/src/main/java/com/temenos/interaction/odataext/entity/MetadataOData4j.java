@@ -129,7 +129,7 @@ public class MetadataOData4j {
 	 * @param odataVersion the odataVersion to set.
 	 */
 	public void setOdataVersion(ODataVersion odataVersion) {
-		logger.debug("Setting configed version to " + odataVersion);
+		logger.debug("OData Version set to " + odataVersion);
 		this.odataVersion = odataVersion;
 	}
 
@@ -248,6 +248,8 @@ public class MetadataOData4j {
 		String namespace = serviceName + Metadata.MODEL_SUFFIX;
 		Builder mdBuilder = EdmDataServices.newBuilder();
 		
+		mdBuilder.setVersion(odataVersion);
+		logger.info("Using OData version " + odataVersion);
 		if (odataVersion==ODataVersion.V2)
 			mdBuilder.addNamespaces(Collections.singletonList(new PrefixedNamespace(TermSemanticType.NAMESPACE, TermSemanticType.PREFIX)));
 		
@@ -373,8 +375,6 @@ public class MetadataOData4j {
 		bSchemas.add(bSchema);
 
 		mdBuilder.addSchemas(bSchemas);
-		mdBuilder.setVersion(odataVersion);
-		logger.debug("Creating version " + odataVersion + " metadata");
 
 		//Build the EDM metadata
 		return mdBuilder.build();
