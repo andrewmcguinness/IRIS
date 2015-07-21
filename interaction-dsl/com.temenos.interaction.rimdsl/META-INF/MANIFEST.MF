@@ -2,7 +2,7 @@ xManifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: com.temenos.interaction.rimdsl
 Bundle-Vendor: IRIS
-Bundle-Version: 0.6.2
+Bundle-Version: 0.6.3.qualifier
 Bundle-SymbolicName: com.temenos.interaction.rimdsl; singleton:=true
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.xtext;bundle-version="[2.7.3,2.8)";visibility:=reexport,
