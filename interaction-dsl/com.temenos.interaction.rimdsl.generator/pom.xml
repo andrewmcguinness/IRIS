@@ -109,7 +109,6 @@
                             <classpathPrefix>lib/</classpathPrefix>
                             <mainClass>com.temenos.interaction.rimdsl.generator.launcher.Launcher</mainClass>
                         </manifest>
-                        <manifestFile>${project.build.directory}/classes/META-INF/MANIFEST.MF</manifestFile>
                     </archive>
                 </configuration>
                 <executions>
@@ -185,10 +184,20 @@
             <artifactId>com.temenos.interaction.rimdsl</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.eclipse.xtend</groupId>
-            <artifactId>org.eclipse.xtend.standalone</artifactId>
+            <artifactId>org.eclipse.xtend.lib</artifactId>
+            <version>${xtend-version}</version>
+        </dependency>
+        <dependency>
+        	<groupId>org.eclipse.xtext</groupId>
+        	<artifactId>org.eclipse.xtext.common.types</artifactId>
+        	<version>${xtend-version}</version>
+        </dependency>
+        <dependency>
+        	<groupId>org.eclipse.xtext</groupId>
+        	<artifactId>org.eclipse.xtext.xbase.lib</artifactId>
+        	<version>${xtend-version}</version>
         </dependency>
 		<dependency>
 			<groupId>commons-cli</groupId>

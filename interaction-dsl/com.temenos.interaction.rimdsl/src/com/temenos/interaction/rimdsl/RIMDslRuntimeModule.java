@@ -30,4 +30,9 @@ public class RIMDslRuntimeModule extends AbstractRIMDslRuntimeModule {
 		return SpecialResourceDescriptionsProvider.class;
 	}
 
+	@Override
+	public Class<? extends org.eclipse.xtext.resource.containers.IAllContainersState.Provider> bindIAllContainersState$Provider() {
+		return FasterResourceSetBasedAllContainersStateProvider.class;
+	}
+
 }
