@@ -7,7 +7,7 @@
 		<groupId>com.temenos.interaction</groupId>
 		<artifactId>com.temenos.interaction.rimdsl.parent</artifactId>
 		<!-- You should change this and the MANIFEST.MF to your versioning scheme -->
-		<version>0.6.3-SNAPSHOT</version>
+		<version>0.6.3</version>
 		<relativePath>../com.temenos.interaction.rimdsl.parent/pom.xml</relativePath>
 	</parent>
 
@@ -18,39 +18,37 @@
 	<profiles>
     	<!-- Plugin update site -->
     	<profile>
-	        <id>pluginRelease</id>
+	        <id>pluginReleaseNormal</id>
 	        <properties>
 	            <pluginReleaseHost>PluginReleaseSite</pluginReleaseHost>
 	            <pluginReleaseDir>/var/www/html/releases/Technology/plugins/IRIS/${project.version}/RIM_DSL/</pluginReleaseDir>
 	            <pluginReleaseUrl>scp://ukhml-bladeas4.temenosgroup.com</pluginReleaseUrl>
 	        </properties>
-	    </profile>
+	</profile>
+	<profile>
+	  <id>pluginRelease</id>
+	  <properties>
+	    <pluginReleaseHost>PluginReleaseSite</pluginReleaseHost>
+	    <pluginReleaseDir>/data/repo/build/iris/p2-iris-rim-dsl-0.6.3</pluginReleaseDir>
+	    <pluginReleaseUrl>scp://cloud-ivy.temenosgroup.com/data/repo/build/iris/p2-iris-rim-dsl-0.6.3</pluginReleaseUrl>
+	  </properties>
+	</profile>
   	</profiles>
 	
 	<!-- Upload configurations are specific to project -->
 	<build>
-		<plugins>
-  			 <plugin>
-		        <groupId>com.atlassian.maven.plugins</groupId>
-		        <artifactId>maven-upload-plugin</artifactId>
-		        <version>1.1</version>
-		        <dependencies>
-		        	<dependency>
-			          	<groupId>org.apache.maven.wagon</groupId>
-			          	<artifactId>wagon-ssh</artifactId>
-			          	<version>2.4</version>
-		        	</dependency>
-		      	</dependencies>
-      			<configuration>
-      				<resourceSrc>
-						${project.build.directory}/repository/*
-				  	</resourceSrc>
-		          	<resourceDest>${pluginReleaseDir}</resourceDest>
-		          	<serverId>${pluginReleaseHost}</serverId>
-		          	<url>${pluginReleaseUrl}</url>
-		        </configuration>
-		     </plugin>
-  		</plugins>
+	  <plugins>
+	    <plugin>
+	      <groupId>org.apache.maven.plugins</groupId>
+	      <artifactId>maven-deploy-plugin</artifactId>
+	      <version>2.8.2</version>
+	      <configuration>
+	      <altDeploymentRepository>PluginReleaseSite::p2::${pluginReleaseUrl}</altDeploymentRepository>
+	      <updateReleaseInfo>false</updateReleaseInfo>
+	      </configuration>
+	    </plugin>
+	    
+          </plugins>
   	</build>
 	
     <pluginRepositories>
