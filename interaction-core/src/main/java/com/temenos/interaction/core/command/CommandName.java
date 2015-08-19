@@ -24,7 +24,6 @@ package com.temenos.interaction.core.command;
 import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface CommandType {
+@Target(ElementType.METHOD)
+public @interface CommandName {
 }
-

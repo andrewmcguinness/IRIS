@@ -26,12 +26,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.temenos.interaction.core.command.Command;
 import com.temenos.interaction.core.command.InteractionCommand;
 import com.temenos.interaction.core.command.InteractionContext;
 import com.temenos.interaction.core.resource.CollectionResource;
 import com.temenos.interaction.core.resource.EntityResource;
 import com.temenos.interaction.example.mashup.twitter.model.Tweet;
 
+@Command(name="GETUserTwitterUpdates")
 public class GETUserTwitterUpdatesCommand implements InteractionCommand {
 
 	public GETUserTwitterUpdatesCommand() {}

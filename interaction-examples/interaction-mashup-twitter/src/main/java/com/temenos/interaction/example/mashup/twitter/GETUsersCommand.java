@@ -25,12 +25,14 @@ package com.temenos.interaction.example.mashup.twitter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.temenos.interaction.core.command.Command;
 import com.temenos.interaction.core.command.InteractionCommand;
 import com.temenos.interaction.core.command.InteractionContext;
 import com.temenos.interaction.core.resource.CollectionResource;
 import com.temenos.interaction.core.resource.EntityResource;
 import com.temenos.interaction.example.mashup.twitter.model.User;
 
+@Command(name="GETUsers")
 public class GETUsersCommand implements InteractionCommand {
 
 	private Persistence persistence;

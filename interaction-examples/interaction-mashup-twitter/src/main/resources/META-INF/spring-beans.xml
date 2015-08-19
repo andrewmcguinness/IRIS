@@ -88,24 +88,20 @@
     </bean>
 
     <!-- Commands -->
-	<bean id="NoopGET" class="com.temenos.interaction.core.command.NoopGETCommand" />
-	<bean id="GETUsers" class="com.temenos.interaction.example.mashup.twitter.GETUsersCommand">
-		<constructor-arg ref="persistence" />
-	</bean>
-	<bean id="GETUser" class="com.temenos.interaction.example.mashup.twitter.GETUserCommand">
-		<constructor-arg ref="persistence" />
-	</bean>
-	<bean id="GETUserTwitterUpdates" class="com.temenos.interaction.example.mashup.twitter.GETUserTwitterUpdatesCommand" />
 
 	<!-- Resource commands -->
 	<bean id="commands" class="com.temenos.interaction.core.command.NewCommandController">
-		<constructor-arg name="commands">
-			<util:map id="commandsMap" map-class="java.util.Hashtable">
-				<entry key="NoopGET" value-ref="NoopGET" />
-				<entry key="GETUsers" value-ref="GETUsers" />
-				<entry key="GETUser" value-ref="GETUser" />
-				<entry key="GETUserTwitterUpdates" value-ref="GETUserTwitterUpdates" />
-			</util:map> 
-		</constructor-arg>
+	  <constructor-arg name="commands">
+		<list>
+		  <bean id="NoopGET" class="com.temenos.interaction.core.command.NoopGETCommand" />
+		  <bean id="GETUsers" class="com.temenos.interaction.example.mashup.twitter.GETUsersCommand">
+			<constructor-arg ref="persistence" />
+		  </bean>
+		  <bean id="GETUser" class="com.temenos.interaction.example.mashup.twitter.GETUserCommand">
+			<constructor-arg ref="persistence" />
+		  </bean>
+		  <bean id="GETUserTwitterUpdates" class="com.temenos.interaction.example.mashup.twitter.GETUserTwitterUpdatesCommand" />
+		</list> 
+	  </constructor-arg>
 	</bean>
 </beans>

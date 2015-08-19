@@ -27,9 +27,11 @@ import javax.ws.rs.core.Response.Status.Family;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.temenos.interaction.core.command.CommandName;
 import com.temenos.interaction.core.command.InteractionCommand;
 import com.temenos.interaction.core.command.InteractionContext;
 import com.temenos.interaction.core.command.InteractionException;
+import com.temenos.interaction.core.command.NewCommandController;
 
 /**
  * <p>This command implements a workflow that will retry if there is an error.</p>
@@ -42,22 +44,39 @@ public class RetryWorkflowStrategyCommand implements InteractionCommand {
 	private InteractionCommand command;
 	private int maxRetryCount;
 	private long maxRetryInterval;
-	
+    private String commandName;
+
 	/**
-	 * Construct with a list of commands to execute.
-	 * @param commands
+	 * Construct with a command to execute.
+	 * @param command
 	 * @param maxRetryCount
 	 * @param maxRetryInterval (in milliseconds)
-	 * @invariant commands not null
 	 */
 	public RetryWorkflowStrategyCommand(InteractionCommand command, int maxRetryCount, long maxRetryInterval) {
+		this(command, maxRetryCount, maxRetryInterval, NewCommandController.defaultCommandName(command));
+	}
+	
+	/**
+	 * Construct with a command to execute.
+	 * @param command
+	 * @param maxRetryCount
+	 * @param maxRetryInterval (in milliseconds)
+	 * @param name the default name to use for this command object in a controller
+	 */
+	public RetryWorkflowStrategyCommand(InteractionCommand command, int maxRetryCount, long maxRetryInterval, String name) {
 		this.command = command;
 		this.maxRetryCount = maxRetryCount;
 		this.maxRetryInterval = maxRetryInterval;
+		this.commandName = name;
 		if (command == null)
 			throw new IllegalArgumentException("No commands supplied");		
 	}
 
+	@CommandName
+	public String commandName() {
+		return this.commandName;
+	}
+	
 	/**
 	 * @throws InteractionException 
 	 * if Family.SERVER_ERROR error then retry maxRetryCount times

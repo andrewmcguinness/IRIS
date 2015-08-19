@@ -21,6 +21,9 @@ package com.temenos.interaction.core.command;
  * #L%
  */
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -55,18 +58,59 @@ public class NewCommandController implements CommandController {
 		}
 	}
 
-    public NewCommandController(Map<String, InteractionCommand> commandMap, List<InteractionCommand> commandList) {
-		for ( String name : commandMap.keySet() )
-			addCommand(name, commandMap.get(name));
-		for ( InteractionCommand cmd : commandList )
-			addCommand( cmd.getClass().getSimpleName(), cmd );
+	/** Add commands without explicit names:
+	 *  If the command has the Command annotation with a "name" argument, use that
+	 *  Otherwise, use the class name (without package name)
+     *  If the class name ends with "Command" strip it off
+	 *  (unless the name is just "Command", in which case use that)
+	 *  This is all intended as a convenient default for one-off commands. If the commands are composed
+	 *  with constructor arguments, or reused across projects, it will probably save confusion in the long
+	 *  run to add them to the controller explicitly with names (i.e. use the Map constructor)
+	 */
+	public NewCommandController(Iterable<InteractionCommand> commandList) {
+	    for ( InteractionCommand cmd : commandList ) {
+			addCommand( defaultCommandName(cmd), cmd );
+		}
 	}
 
-	public NewCommandController(List<InteractionCommand> commands) {
-		for ( InteractionCommand cmd : commands )
-			addCommand( cmd.getClass().getSimpleName(), cmd );
-	}
+	public static String defaultCommandName( InteractionCommand cmd ) {
+		String name = null;
 
+		Class<?> clazz = cmd.getClass();
+		// Check for a @CommandName annotation
+		for ( Method m : clazz.getMethods() ) {
+			try {			
+				if ( m.isAnnotationPresent(CommandName.class) ) {
+					if (m.getParameterTypes().length > 0)
+						throw new IllegalArgumentException( "ClassName annotation invalid: " + clazz.getName() + "." + m.getName() +
+															"() method should have zero parameters" );
+					name = m.invoke(cmd).toString();
+					break;
+				}
+			}
+			catch ( IllegalAccessException e ) {
+				throw new IllegalArgumentException( "Cannot invoke @ClassName method " + clazz.getName() + "." + m.getName(), e );
+			}
+			catch ( InvocationTargetException e ) {
+				throw new IllegalArgumentException( "Cannot invoke @ClassName method " + clazz.getName() + "." + m.getName(), e );
+			}
+		}
+
+		// Check for a @Command(name=...) annotation
+		if ( clazz.isAnnotationPresent(Command.class) )
+			name = clazz.getAnnotation(Command.class).name();
+				
+		// Fall back to using the class name
+		if ((name == null) || name.isEmpty() ) {
+			String className = clazz.getSimpleName();
+			if ((className.length() > 7) && className.endsWith("Command" ))
+				name = className.substring(0, className.length() - 7);
+			else
+				name = className;
+		}
+		return name;
+	}
+	
 	/**
 	 * Add a command to transition a resources state.
 	 * @precondition name not null

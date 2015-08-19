@@ -22,11 +22,13 @@ package com.temenos.interaction.example.mashup.twitter;
  */
 
 
+import com.temenos.interaction.core.command.Command;
 import com.temenos.interaction.core.command.InteractionCommand;
 import com.temenos.interaction.core.command.InteractionContext;
 import com.temenos.interaction.core.resource.EntityResource;
 import com.temenos.interaction.example.mashup.twitter.model.User;
 
+@Command(name="GETUser")
 public class GETUserCommand implements InteractionCommand {
 
 	private Persistence persistence;
