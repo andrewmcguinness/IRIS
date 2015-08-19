@@ -57,7 +57,7 @@ import com.temenos.interaction.core.command.InteractionCommand;
 import com.temenos.interaction.core.command.InteractionCommand.Result;
 import com.temenos.interaction.core.command.InteractionContext;
 import com.temenos.interaction.core.command.InteractionException;
-import com.temenos.interaction.core.command.NewCommandController;
+import com.temenos.interaction.core.command.CommandController;
 import com.temenos.interaction.core.entity.Entity;
 import com.temenos.interaction.core.entity.EntityProperties;
 import com.temenos.interaction.core.entity.EntityProperty;
@@ -101,7 +101,7 @@ public class HTTPHypermediaRIM implements HTTPResourceInteractionModel {
 
 
 	private final HTTPHypermediaRIM parent;
-	private final NewCommandController commandController;
+	private final CommandController commandController;
 	private final ResourceStateMachine hypermediaEngine;
 	private final ResourceRequestHandler resourceRequestHandler;
 	private final Metadata metadata;
@@ -117,7 +117,7 @@ public class HTTPHypermediaRIM implements HTTPResourceInteractionModel {
 	 * 			The current application state when accessing this resource.
 	 */
 	public HTTPHypermediaRIM(
-			NewCommandController commandController, 
+			CommandController commandController, 
 			ResourceStateMachine hypermediaEngine,
 			Metadata metadata) {
 		this(null, commandController, hypermediaEngine, metadata, hypermediaEngine.getInitial().getResourcePath(), true);				
@@ -133,7 +133,7 @@ public class HTTPHypermediaRIM implements HTTPResourceInteractionModel {
 	 * 			The current application state when accessing this resource.
 	 */
 	public HTTPHypermediaRIM(
-			NewCommandController commandController, 
+			CommandController commandController, 
 			ResourceStateMachine hypermediaEngine,
 			Metadata metadata,
 			ResourceLocatorProvider resourceLocatorProvider) {
@@ -154,7 +154,7 @@ public class HTTPHypermediaRIM implements HTTPResourceInteractionModel {
 	 */
 	protected HTTPHypermediaRIM(
 			HTTPHypermediaRIM parent, 
-			NewCommandController commandController, 
+			CommandController commandController, 
 			ResourceStateMachine hypermediaEngine,
 			ResourceState currentState,
 			Metadata metadata) {
@@ -163,7 +163,7 @@ public class HTTPHypermediaRIM implements HTTPResourceInteractionModel {
 	
 	public HTTPHypermediaRIM(
 			HTTPHypermediaRIM parent, 
-			NewCommandController commandController, 
+			CommandController commandController, 
 			ResourceStateMachine hypermediaEngine,
 			Metadata metadata,
 			String currentPath,
@@ -270,7 +270,7 @@ public class HTTPHypermediaRIM implements HTTPResourceInteractionModel {
     /*
      * The map of all commands for http methods, paths, and media types.
      */
-    protected NewCommandController getCommandController() {
+    protected CommandController getCommandController() {
 		return commandController;
 	}
 

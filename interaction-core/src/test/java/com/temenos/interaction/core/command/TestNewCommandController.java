@@ -41,28 +41,11 @@ public class TestNewCommandController {
 		assertNull(command);
 	}
 
-	@Test(expected = AssertionError.class)
-	public void testFetchCommandNoCommandsSet() {
-		new NewCommandController(null);
-	}
-
 	@Test
 	public void testFetchCommandNoCommandsSetNotFound() {
 		NewCommandController cc = new NewCommandController(new HashMap<String, InteractionCommand>());
 		InteractionCommand command = cc.fetchCommand("dostuff");
 		assertNull(command);
-	}
-
-	@Test(expected = AssertionError.class)
-	public void testAddNullCommand() {
-		NewCommandController cc = new NewCommandController();
-		cc.addCommand("commandName", null);
-	}
-
-	@Test(expected = AssertionError.class)
-	public void testAddNullName() {
-		NewCommandController cc = new NewCommandController();
-		cc.addCommand(null, mock(InteractionCommand.class));
 	}
 
 	@Test

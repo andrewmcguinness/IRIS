@@ -21,14 +21,16 @@ package com.temenos.interaction.core.command;
  * #L%
  */
 
-
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NewCommandController {
+public class NewCommandController implements CommandController {
 	private final Logger logger = LoggerFactory.getLogger(NewCommandController.class);
 
 	private Map<String, InteractionCommand> commands = new HashMap<String, InteractionCommand>();
@@ -53,6 +55,18 @@ public class NewCommandController {
 		}
 	}
 
+    public NewCommandController(Map<String, InteractionCommand> commandMap, List<InteractionCommand> commandList) {
+		for ( String name : commandMap.keySet() )
+			addCommand(name, commandMap.get(name));
+		for ( InteractionCommand cmd : commandList )
+			addCommand( cmd.getClass().getSimpleName(), cmd );
+	}
+
+	public NewCommandController(List<InteractionCommand> commands) {
+		for ( InteractionCommand cmd : commands )
+			addCommand( cmd.getClass().getSimpleName(), cmd );
+	}
+
 	/**
 	 * Add a command to transition a resources state.
 	 * @precondition name not null
@@ -61,6 +75,8 @@ public class NewCommandController {
 	public void addCommand(String name, InteractionCommand c) {
 		assert(name != null);
 		assert(c != null);
+		if ( commands.containsKey(name) )
+			throw new IllegalArgumentException( "Duplicate command name " + name + " (Controller has " + commands.size() + " commands)" );
 		commands.put(name, c);
 	}
 
@@ -82,5 +98,11 @@ public class NewCommandController {
 
 	public boolean isValidCommand(String name) {
 		return (commands.get(name) != null);
+	}
+
+	/** read-only iterator for commands
+	 */
+	public Iterator<String> iterator() {
+		return Collections.unmodifiableSet( commands.keySet() ).iterator();
 	}
 }

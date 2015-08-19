@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.temenos.interaction.core.command.InteractionCommand;
-import com.temenos.interaction.core.command.NewCommandController;
+import com.temenos.interaction.core.command.CommandController;
 import com.temenos.interaction.core.entity.Metadata;
 import com.temenos.interaction.core.hypermedia.Action;
 import com.temenos.interaction.core.hypermedia.LazyCollectionResourceState;
@@ -96,7 +96,7 @@ public class HypermediaValidator {
 			}
 			boolean viewActionSeen = false;
 			for (Action action : actions) {
-				NewCommandController commandController = hypermediaEngine.getCommandController();
+				CommandController commandController = hypermediaEngine.getCommandController();
 				assert(commandController != null);
 				InteractionCommand command = commandController.fetchCommand(action.getName());
 				if (command == null) {
