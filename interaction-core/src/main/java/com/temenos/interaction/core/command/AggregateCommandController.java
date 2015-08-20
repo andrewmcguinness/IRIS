@@ -32,7 +32,7 @@ public class AggregateCommandController implements CommandController {
     private final Logger logger = LoggerFactory.getLogger(AggregateCommandController.class);
     private final ArrayList<CommandController> elements = new ArrayList<CommandController>(4);
     
-    public AggregateCommandController(Iterable<CommandController> elements, boolean allowDups) {
+    public AggregateCommandController(Iterable<? extends CommandController> elements, boolean allowDups) {
 	for ( CommandController cc : elements ) {
 	    if ( !allowDups) {
 		for ( String cmd : cc ) {
@@ -44,7 +44,7 @@ public class AggregateCommandController implements CommandController {
 	}
     }
 
-    public AggregateCommandController(Iterable<CommandController> elements) {
+    public AggregateCommandController(Iterable<? extends CommandController> elements) {
 	this(elements, false);
     }
 

@@ -1,4 +1,4 @@
-package com.temenos.interaction.core.command;
+package com.temenos.interaction.core.command.naming;
 
 /*
  * #%L
@@ -21,30 +21,14 @@ package com.temenos.interaction.core.command;
  * #L%
  */
 
+import java.lang.annotation.*;
 
-import com.temenos.interaction.core.resource.EntityResource;
-import com.temenos.interaction.core.resource.RESTResource;
-
-/**
- * A GET command that does nothing.  Can be useful for laying out a straw
- * man of resources and not needing to implement them all initially.
- * @author aphethean
+/** This allows the default command name of a command class to be specified easily.
+ *  If not used (and @CommandName not used) then the class name is the default.
+ *  The annotation is processed in the NamedCommand class
  */
-public final class NoopGETCommand implements InteractionCommand {
-
-	/* Implement InteractionCommand interface */
-	
-	@Override
-	public Result execute(InteractionContext ctx) {
-		assert(ctx != null);
-		RESTResource resource = ctx.getResource();
-		if(resource != null) {
-			ctx.setResource(resource);
-		}
-		else {
-			ctx.setResource(new EntityResource<Object>());
-		}
-		return Result.SUCCESS;
-	}
-
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface Command {
+    String name() default "";
 }

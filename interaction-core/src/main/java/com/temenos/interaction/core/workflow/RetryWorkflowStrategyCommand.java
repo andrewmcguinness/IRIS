@@ -27,11 +27,11 @@ import javax.ws.rs.core.Response.Status.Family;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.temenos.interaction.core.command.CommandName;
 import com.temenos.interaction.core.command.InteractionCommand;
 import com.temenos.interaction.core.command.InteractionContext;
 import com.temenos.interaction.core.command.InteractionException;
-import com.temenos.interaction.core.command.NewCommandController;
+import com.temenos.interaction.core.command.naming.CommandName;
+import com.temenos.interaction.core.command.naming.NamedCommand;
 
 /**
  * <p>This command implements a workflow that will retry if there is an error.</p>
@@ -53,7 +53,7 @@ public class RetryWorkflowStrategyCommand implements InteractionCommand {
 	 * @param maxRetryInterval (in milliseconds)
 	 */
 	public RetryWorkflowStrategyCommand(InteractionCommand command, int maxRetryCount, long maxRetryInterval) {
-		this(command, maxRetryCount, maxRetryInterval, NewCommandController.defaultCommandName(command));
+		this(command, maxRetryCount, maxRetryInterval, NamedCommand.defaultName(command));
 	}
 	
 	/**

@@ -1,4 +1,4 @@
-package com.temenos.interaction.core.command;
+package com.temenos.interaction.core.command.naming;
 
 /*
  * #%L
@@ -23,8 +23,10 @@ package com.temenos.interaction.core.command;
 
 import java.lang.annotation.*;
 
+/** The default command name of an InteractionCommand class can be overridden by
+ *  declaring a method on it and marking it with this annotation.
+ */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface Command {
-    String name() default "";
+@Target(ElementType.METHOD)
+public @interface CommandName {
 }

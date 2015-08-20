@@ -1,10 +1,10 @@
-package com.temenos.interaction.core.command;
+package com.temenos.interaction.core.command.naming.cmds;
 
 /*
  * #%L
  * interaction-core
  * %%
- * Copyright (C) 2012 - 2013 Temenos Holdings N.V.
+ * Copyright (C) 2012 - 2015 Temenos Holdings N.V.
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,9 +21,14 @@ package com.temenos.interaction.core.command;
  * #L%
  */
 
-import java.lang.annotation.*;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface CommandName {
+import com.temenos.interaction.core.command.InteractionCommand;
+import com.temenos.interaction.core.command.InteractionContext;
+
+public class VanillaCommand implements InteractionCommand {
+    public VanillaCommand() {}
+
+    public Result execute(InteractionContext ctx) {
+	return Result.SUCCESS;
+    }
 }

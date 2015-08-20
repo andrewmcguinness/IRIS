@@ -1,10 +1,10 @@
-package com.temenos.interaction.example.mashup.twitter;
+package com.temenos.interaction.core.command.naming.cmds;
 
 /*
  * #%L
- * interaction-example-mashup-twitter
+ * interaction-core
  * %%
- * Copyright (C) 2012 - 2013 Temenos Holdings N.V.
+ * Copyright (C) 2012 - 2015 Temenos Holdings N.V.
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,33 +21,15 @@ package com.temenos.interaction.example.mashup.twitter;
  * #L%
  */
 
+import com.temenos.interaction.core.command.naming.Command;
 import com.temenos.interaction.core.command.InteractionCommand;
 import com.temenos.interaction.core.command.InteractionContext;
-import com.temenos.interaction.core.resource.EntityResource;
-import com.temenos.interaction.example.mashup.twitter.model.User;
 
-public class GETUserCommand implements InteractionCommand {
+@Command(name="Aardvark")
+public class StaticNamedCommand implements InteractionCommand {
+    public StaticNamedCommand() {}
 
-	private Persistence persistence;
-	
-	public GETUserCommand(Persistence p) {
-		persistence = p;
-	}
-
-	/* Implement InteractionCommand interface */
-	
-	@Override
-	public Result execute(InteractionContext ctx) {
-		assert(ctx != null);
-		// retrieve from a database, etc.
-		String id = ctx.getId();
-		User user = persistence.getUser(new Long(id));
-		if (user != null) {
-			ctx.setResource(new EntityResource<User>(user));
-			return Result.SUCCESS;
-		} else {
-			return Result.FAILURE;
-		}
-	}
-
+    public Result execute(InteractionContext ctx) {
+	return Result.SUCCESS;
+    }
 }
