@@ -101,13 +101,13 @@
 	</bean>
 
 	<util:list id="localCommands">
-	  <bean id="NoopGET" class="com.temenos.interaction.core.command.NoopGETCommand" />
-	  <bean id="GETUsers" class="com.temenos.interaction.example.mashup.twitter.GETUsersCommand">
+	  <bean class="com.temenos.interaction.core.command.NoopGETCommand" />
+	  <bean class="com.temenos.interaction.example.mashup.twitter.GETUsersCommand">
 		<constructor-arg ref="persistence" />
 	  </bean>
-	  <bean id="GETUser" class="com.temenos.interaction.example.mashup.twitter.GETUserCommand">
+	  <bean class="com.temenos.interaction.example.mashup.twitter.GETUserCommand">
 		<constructor-arg ref="persistence" />
 	  </bean>
-	  <bean id="GETUserTwitterUpdates" class="com.temenos.interaction.example.mashup.twitter.GETUserTwitterUpdatesCommand" />
+	  <bean class="com.temenos.interaction.example.mashup.twitter.GETUserTwitterUpdatesCommand" />
 	</util:list>
 </beans>

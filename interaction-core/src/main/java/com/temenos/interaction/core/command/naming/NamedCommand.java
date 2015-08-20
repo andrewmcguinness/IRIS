@@ -45,9 +45,9 @@ public class NamedCommand {
     private String name;
     private InteractionCommand command;
     
-    public NamedCommand( String name, InteractionCommand cmd ) {
+    public NamedCommand( String name, InteractionCommand command ) {
 		this.name = name;
-		this.command = cmd;
+		this.command = command;
     }
 
     public NamedCommand( InteractionCommand cmd ) {
