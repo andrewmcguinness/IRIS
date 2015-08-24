@@ -68,8 +68,7 @@ public class NamedCommand {
 					if (m.getParameterTypes().length > 0)
 						throw new IllegalArgumentException( "ClassName annotation invalid: " + clazz.getName() + "." + m.getName() +
 															"() method should have zero parameters" );
-					name = m.invoke(cmd).toString();
-					break;
+					return m.invoke(cmd).toString();
 				}
 			}
 			catch ( IllegalAccessException e ) {
@@ -82,18 +81,14 @@ public class NamedCommand {
 
 		// Check for a @Command(name=...) annotation
 		if ( clazz.isAnnotationPresent(Command.class) )
-			name = clazz.getAnnotation(Command.class).name();
+			return clazz.getAnnotation(Command.class).name();
 
 		// Fall back to using the class name
-		if ((name == null) || name.isEmpty() ) {
-			String className = clazz.getSimpleName();
-			if ((className.length() > 7) && className.endsWith("Command" ))
-				name = className.substring(0, className.length() - 7);
-			else
-			name = className;
-		}
-		return name;
-	}
+		String className = clazz.getSimpleName();
+		if ((className.length() > 7) && className.endsWith("Command" ))
+		    return className.substring(0, className.length() - 7);
 
+		return className;
+	}
 }
 
