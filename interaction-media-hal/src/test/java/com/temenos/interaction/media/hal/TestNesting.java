@@ -179,7 +179,7 @@ public class TestNesting {
 		properties.add(OProperties.string("age", "2"));
 
 		OCollection rides = OCollections.newBuilder(ridesCollectionType).
-			add(makeHorse("Harley", "12.3")).
+			add(makeHorse("Harley", "12.2")).
 			add(makeHorse("Donny", "13.2")).
 			build();
 
@@ -197,7 +197,7 @@ public class TestNesting {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		hp.writeTo(er, EntityResource.class, OEntity.class, null, MediaType.APPLICATION_HAL_JSON_TYPE, null, bos);
 
-		String expectedJSON = "{'_links':{'self':{'href':'http://www.temenos.com/rest.svc/'}},'age':'2','name':'noah','rides':[{'HorseSize':'12.3','HorseName':'Harley'},{'HorseSize':'13.2','HorseName':'Donny'}]}".replace('\'','\"');
+		String expectedJSON = "{'_links':{'self':{'href':'http://www.temenos.com/rest.svc/'}},'age':'2','name':'noah','rides':[{'HorseSize':'12.2','HorseName':'Harley'},{'HorseSize':'13.2','HorseName':'Donny'}]}".replace('\'','\"');
 
 		String responseString = createFlatXML(bos);
 		System.err.println(responseString);
@@ -217,7 +217,7 @@ public class TestNesting {
 		properties.add(OProperties.string("age", "2"));
 
 		OCollection rides = OCollections.newBuilder(ridesCollectionType).
-			add(makeHorse("Harley", "12.3")).
+			add(makeHorse("Harley", "12.2")).
 			//			add(makeHorse("Donny", "13.2")).
 			build();
 
@@ -235,7 +235,7 @@ public class TestNesting {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		hp.writeTo(er, EntityResource.class, OEntity.class, null, MediaType.APPLICATION_HAL_JSON_TYPE, null, bos);
 
-		String expectedJSON = "{'_links':{'self':{'href':'http://www.temenos.com/rest.svc/'}},'age':'2','name':'noah','rides':[{'HorseSize':'12.3','HorseName':'Harley'}]}".replace('\'','\"');
+		String expectedJSON = "{'_links':{'self':{'href':'http://www.temenos.com/rest.svc/'}},'age':'2','name':'noah','rides':[{'HorseSize':'12.2','HorseName':'Harley'}]}".replace('\'','\"');
 
 		String responseString = createFlatXML(bos);
 		System.err.println(responseString);
