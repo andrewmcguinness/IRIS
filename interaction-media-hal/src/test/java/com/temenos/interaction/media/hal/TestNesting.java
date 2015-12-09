@@ -128,7 +128,7 @@ public class TestNesting {
 	}
 	
 
-	private String createFlatXML(ByteArrayOutputStream bos) throws Exception {
+	private String makeSingleLineString(ByteArrayOutputStream bos) throws Exception {
 		String responseString = new String(bos.toByteArray(), "UTF-8");
 		responseString = responseString.replaceAll(System.getProperty("line.separator"), "");
 		responseString = responseString.replaceAll(">\\s+<", "><");
@@ -199,7 +199,7 @@ public class TestNesting {
 
 		String expectedJSON = "{'_links':{'self':{'href':'http://www.temenos.com/rest.svc/'}},'age':'2','name':'noah','rides':[{'HorseSize':'12.2','HorseName':'Harley'},{'HorseSize':'13.2','HorseName':'Donny'}]}".replace('\'','\"');
 
-		String responseString = createFlatXML(bos);
+		String responseString = makeSingleLineString(bos);
 		System.err.println(responseString);
 
 		assertEquals(expectedJSON, responseString);
@@ -237,7 +237,7 @@ public class TestNesting {
 
 		String expectedJSON = "{'_links':{'self':{'href':'http://www.temenos.com/rest.svc/'}},'age':'2','name':'noah','rides':[{'HorseSize':'12.2','HorseName':'Harley'}]}".replace('\'','\"');
 
-		String responseString = createFlatXML(bos);
+		String responseString = makeSingleLineString(bos);
 		System.err.println(responseString);
 
 		assertEquals(expectedJSON, responseString);
