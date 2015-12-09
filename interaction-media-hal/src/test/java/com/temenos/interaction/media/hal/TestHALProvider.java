@@ -433,7 +433,7 @@ public class TestHALProvider {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		hp.writeTo(childEntityResource, EntityResource.class, OEntity.class, null, MediaType.APPLICATION_HAL_JSON_TYPE, null, bos);
 
-		String expectedXML = "{\"_links\":{\"self\":{\"href\":\"/child/123\"},\"person\":{\"href\":\"/parent/333\",\"name\":\"parent\",\"title\":\"parent\"}},\"age\":\"2\",\"name\":\"noah\",\"_embedded\":{\"person\":{\"_links\":{\"self\":{\"href\":\"/parent/333\"}},\"age\":\"30\",\"name\":\"aaron\"}}}";
+		String expectedXML = "{\"_links\":{\"self\":{\"href\":\"/child/123\"},\"person\":[{\"href\":\"/parent/333\",\"name\":\"parent\",\"title\":\"parent\"}]},\"age\":\"2\",\"name\":\"noah\",\"_embedded\":{\"person\":[{\"_links\":{\"self\":{\"href\":\"/parent/333\"}},\"age\":\"30\",\"name\":\"aaron\"}]}}";
 		String responseString = new String(bos.toByteArray(), "UTF-8");
 		responseString = responseString.replaceAll(System.getProperty("line.separator"), "");
 		assertEquals(expectedXML, responseString);

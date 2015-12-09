@@ -35,6 +35,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -57,8 +58,15 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
+import org.odata4j.core.OCollection;
+import org.odata4j.core.OComplexObject;
 import org.odata4j.core.OEntity;
+import org.odata4j.core.OObject;
 import org.odata4j.core.OProperty;
+import org.odata4j.core.OSimpleObject;
+import org.odata4j.edm.EdmCollectionType;
+import org.odata4j.edm.EdmComplexType;
+import org.odata4j.edm.EdmType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,7 +105,7 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 	private Request requestContext;
 	private Metadata metadata = null;
 	private ResourceStateProvider resourceStateProvider;
-    private RepresentationFactory representationFactory = new StandardRepresentationFactory();
+    private RepresentationFactory representationFactory = new StandardRepresentationFactory().withFlag(RepresentationFactory.SINGLE_ELEM_ARRAYS);
 
 	public HALProvider(Metadata metadata, ResourceStateProvider resourceStateProvider) {
 		this(metadata);
@@ -265,6 +273,42 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 		return selfLink;
 	}
 
+	protected Object buildFromOObject(EntityMetadata entityMetadata, OObject object)
+	{
+		if (object.getType().isSimple())
+			return ((OSimpleObject<Object>)object).getValue().toString();
+		else {
+			OComplexObject complex = (OComplexObject)object;
+			HashMap<String,Object> map = new HashMap<String,Object>();
+			for (OProperty property : complex.getProperties()) {
+				if (entityMetadata.getPropertyVocabulary(property.getName()) != null && property.getValue() != null) {
+					EdmType type = property.getType();
+					if ( type.isSimple() ) {
+						// call toString on object as a simple why of handling non simple types
+						map.put(property.getName(), property.getValue().toString());
+						logger.debug(String.format("add property %s = %s", property.getName(), property.getValue()));
+					} else if ( type instanceof EdmCollectionType ) {
+						EdmType elementType = ((EdmCollectionType)type).getItemType();
+						ArrayList builtList = new ArrayList<Object>();
+						OCollection<OObject> collection = (OCollection<OObject>)property.getValue();
+						for ( OObject each : collection ) {
+							builtList.add(buildFromOObject(entityMetadata, each));
+						}
+						map.put(property.getName(), builtList);
+				} else if ( type instanceof EdmComplexType ) {
+						map.put(property.getName(), buildFromOObject(entityMetadata, (OComplexObject)(property.getValue())));
+					} else {
+						logger.error(String.format("Unknown property with type %s not included in HAL response",type));
+					}					
+				}
+				else {
+					logger.debug(String.format("not adding property %s, value %s", property.getName(), property.getValue()));
+				}
+			}
+			return map;
+		}
+	}
+
 	protected void buildFromOEntity(Map<String, Object> map, OEntity entity, String entityName) {
 		EntityMetadata entityMetadata = metadata.getEntityMetadata(entityName);
 		if (entityMetadata == null)
@@ -273,8 +317,28 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 		for (OProperty<?> property : entity.getProperties()) {
 			// add properties if they are present on the resolved entity
 			if (entityMetadata.getPropertyVocabulary(property.getName()) != null && property.getValue() != null) {
-				// call toString on object as a simple why of handling non simple types
-				map.put(property.getName(), property.getValue().toString());				
+				EdmType type = property.getType();
+				if ( type.isSimple() ) {
+					// call toString on object as a simple why of handling non simple types
+					map.put(property.getName(), property.getValue().toString());
+					logger.debug(String.format("add property %s = %s", property.getName(), property.getValue()));
+				} else if ( type instanceof EdmCollectionType ) {
+					EdmType elementType = ((EdmCollectionType)type).getItemType();
+					ArrayList builtList = new ArrayList<Object>();
+					OCollection<OObject> collection = (OCollection<OObject>)property.getValue();
+					for ( OObject each : collection ) {
+						builtList.add(buildFromOObject(entityMetadata, each));
+					}
+					map.put(property.getName(), builtList);
+					logger.debug(String.format("add collection property %s = %d items", property.getName(), builtList.size()));
+				} else if ( type instanceof EdmComplexType ) {
+					map.put(property.getName(), buildFromOObject(entityMetadata, (OComplexObject)property.getValue()));
+				} else {
+					logger.error(String.format("Unknown property with type %s not included in HAL response",type));
+				}					
+			}
+			else {
+				logger.debug(String.format("not adding property %s, value %s", property.getName(), property.getValue()));
 			}
 		}
 	}
@@ -329,6 +393,7 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 			buildFromOEntity(propertyMap, oentityResource.getEntity(), oentityResource.getEntityName());
 			// add properties to HAL resource
 			for (String key : propertyMap.keySet()) {
+				logger.debug(String.format("add property to representation: %s %s = %s", propertyMap.get(key).getClass(), key, propertyMap.get(key)));
 				halResource.withProperty(key, propertyMap.get(key));
 			}
 		} else if (ResourceTypeHelper.isType(type, genericType, EntityResource.class, Entity.class)) {

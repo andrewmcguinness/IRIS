@@ -51,6 +51,17 @@
 					</reportPlugins>
 				</configuration>
 			</plugin>
+			<plugin>
+			  <artifactId>maven-surefire-plugin</artifactId>
+			  <configuration>
+				<systemProperties>
+				  <property> 
+					<name>logback.configurationFile</name>
+					<value>src/test/resources/logback.xml</value>
+				  </property>
+				</systemProperties>
+			  </configuration>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -114,7 +125,15 @@
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
             <scope>test</scope>
-        </dependency>        
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>0.9.29</version>
+            <scope>test</scope>
+        </dependency>
+
+		  
  	</dependencies>
 
 	<!-- SONAR TEST COVERAGE PROFILE-->
