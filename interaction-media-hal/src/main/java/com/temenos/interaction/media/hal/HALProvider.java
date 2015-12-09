@@ -163,8 +163,10 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 				for (Link l : links) {
 					if (l.equals(selfLink))
 						continue;
-					logger.debug("Link: id=[" + l.getId() + "] rel=[" + l.getRel() + "] method=[" + l.getMethod() + "] href=[" + l.getHref() + "]");
-					// Representation withLink(String rel, String href, String name, String title, String hreflang, String profile);
+					logger.debug("Link: id=[" + l.getId() + "] rel=[" + l.getRel() +
+								 "] method=[" + l.getMethod() + "] href=[" + l.getHref() + "]");
+					// Representation withLink(String rel, String href, String name, String title,
+					//                         String hreflang, String profile);
 					String[] rels = new String[0];
 					if (l.getRel() != null) {
 						rels = l.getRel().split(" ");
@@ -187,8 +189,12 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 					Link link = findLinkByTransition(links, t);
 					String rel = (link.getRel() != null ? link.getRel() : "embedded/" + embeddedResource.getEntityName());
 					logger.debug("Embedded: rel=[" + rel + "] href=[" + link.getHref() + "]");
-					Representation embeddedRepresentation = buildHalResource(new URI(link.getHref()), embeddedResource, type, genericType);
-//					Representation embeddedRepresentation = buildRepresentation(representationFactory.newRepresentation(link.getHref()), embeddedResource, type, genericType);
+					Representation embeddedRepresentation = buildHalResource(new URI(link.getHref()),
+																			 embeddedResource,
+																			 type,
+																			 genericType);
+//					Representation embeddedRepresentation = buildRepresentation(
+//  					representationFactory.newRepresentation(link.getHref()), embeddedResource, type, genericType);
 					halResource.withRepresentation(rel, embeddedRepresentation);
 				}
 			}
@@ -260,7 +266,8 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 		if (links != null) {
 			for (Link l : links) {
 				Transition t = l.getTransition();
-				// TODO this bit is a bit hacky.  The latest version of the HAL spec should not require us to find a 'self' link for the subresource
+				// TODO this bit is a bit hacky.
+				// The latest version of the HAL spec should not require us to find a 'self' link for the subresource
 				if (l.getRel().contains("self") ||
 						(l.getTransition() != null 
 						&& (t.getCommand().getMethod() == null || t.getCommand().getMethod().equals("GET"))
@@ -273,7 +280,10 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 		return selfLink;
 	}
 
-	protected Object buildFromOObject(EntityMetadata entityMetadata, Object any)
+	/** transform OData4j object into String, Map or List
+	 *  Only properties defined in the entityMetadata vocabulary are included in transform output
+	 */
+	private Object buildFromOObject(EntityMetadata entityMetadata, Object any)
 	{
 		if (any instanceof OObject) {
 			OObject object = (OObject)any;
@@ -291,11 +301,12 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 				OComplexObject complex = (OComplexObject)object;
 				HashMap<String,Object> map = new HashMap<String,Object>();
 				for (OProperty property : complex.getProperties()) {
-					if (entityMetadata.getPropertyVocabulary(property.getName()) != null && property.getValue() != null) {
+					if (entityMetadata.getPropertyVocabulary(property.getName()) != null
+						&& property.getValue() != null) {
 						map.put(property.getName(), buildFromOObject(entityMetadata, property.getValue()));
-					}
-					else {
-						logger.debug(String.format("not adding property %s, value %s", property.getName(), property.getValue()));
+					} else {
+						logger.debug(String.format("not adding property %s, value %s",
+												   property.getName(), property.getValue()));
 					}
 				}
 				return map;
@@ -304,6 +315,8 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 			return any.toString();
 	}
 
+	/** populate a Map with the properties of an OEntity
+	 */
 	protected void buildFromOEntity(Map<String, Object> map, OEntity entity, String entityName) {
 		EntityMetadata entityMetadata = metadata.getEntityMetadata(entityName);
 		if (entityMetadata == null)
@@ -311,15 +324,20 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 
 		for (OProperty<?> property : entity.getProperties()) {
 			// add properties if they are present on the resolved entity
-			if (entityMetadata.getPropertyVocabulary(property.getName()) != null && property.getValue() != null) {
+			if (entityMetadata.getPropertyVocabulary(property.getName()) != null
+				&& property.getValue() != null) {
 				map.put(property.getName(),buildFromOObject(entityMetadata, property.getValue()));
 			}
 			else {
-				logger.debug(String.format("not adding property %s, value %s", property.getName(), property.getValue()));
+				logger.debug(String.format("not adding property %s, value %s",
+										   property.getName(), property.getValue()));
 			}
 		}
 	}
-	
+
+	/** populate a Map from an Entity
+	 *  TODO implement nested structures and collections
+	 */
 	protected void buildFromEntity(Map<String, Object> map, Entity entity) {
 
 		EntityProperties entityProperties = entity.getProperties();
@@ -333,6 +351,9 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 		}
 	}
 	
+	/** populate a Map from a java bean
+	 *  TODO implement nested structures and collections
+	 */
 	protected void buildFromBean(Map<String, Object> map, Object bean, String entityName) {
 		EntityMetadata entityMetadata = metadata.getEntityMetadata(entityName);
 		if (entityMetadata == null)
@@ -358,7 +379,10 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 		}
 	}
 
-	private Representation buildRepresentation(Representation halResource, RESTResource resource, Class<?> type, Type genericType) {
+	private Representation buildRepresentation(Representation halResource,
+											   RESTResource resource,
+											   Class<?> type,
+											   Type genericType) {
 		if (genericType == null)
 			genericType = resource.getGenericEntity().getType();
 		if (type == null)
@@ -370,7 +394,9 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 			buildFromOEntity(propertyMap, oentityResource.getEntity(), oentityResource.getEntityName());
 			// add properties to HAL resource
 			for (String key : propertyMap.keySet()) {
-				logger.debug(String.format("add property to representation: %s %s = %s", propertyMap.get(key).getClass(), key, propertyMap.get(key)));
+				logger.debug(String.format("add property to representation: %s %s = %s",
+										   propertyMap.get(key).getClass(), key,
+										   propertyMap.get(key)));
 				halResource.withProperty(key, propertyMap.get(key));
 			}
 		} else if (ResourceTypeHelper.isType(type, genericType, EntityResource.class, Entity.class)) {
@@ -412,14 +438,11 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 				Representation subResource = representationFactory.newRepresentation();
 	
 				
-				/* FIX here */
 				Collection<Link> links = er.getLinks();
 				if (links != null) {
 					for (Link l : links) {
-//						if (l.equals(selfLink))
-//							continue;
-						logger.debug("Link: id=[" + l.getId() + "] rel=[" + l.getRel() + "] method=[" + l.getMethod() + "] href=[" + l.getHref() + "]");
-						// Representation withLink(String rel, String href, String name, String title, String hreflang, String profile);
+						logger.debug("Link: id=[" + l.getId() + "] rel=[" + l.getRel() +
+									 "] method=[" + l.getMethod() + "] href=[" + l.getHref() + "]");
 						String[] rels = new String[0];
 						if (l.getRel() != null) {
 							rels = l.getRel().split(" ");
@@ -433,9 +456,6 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 					}
 				}
 		
-//				for (Link el : er.getLinks()) {
-//					subResource.withLink(el.getRel(), el.getHref());
-//				}
 				// add properties to HAL sub resource
 				for (String key : propertyMap.keySet()) {
 					subResource.withProperty(key, propertyMap.get(key));
@@ -510,7 +530,7 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 				&& (mediaType.isCompatible(com.temenos.interaction.media.hal.MediaType.APPLICATION_HAL_XML_TYPE) 
 						|| mediaType.isCompatible(com.temenos.interaction.media.hal.MediaType.APPLICATION_HAL_JSON_TYPE)));
 
-		//Parse hal+json into an OEntity object
+		//Parse hal+json into an Entity object
 		Entity entity = buildEntityFromHal(entityStream);
 		return new EntityResource<Entity>(entity);
 	}

@@ -89,6 +89,8 @@ import com.temenos.interaction.core.resource.EntityResource;
 import com.temenos.interaction.core.resource.MetaDataResource;
 import com.temenos.interaction.core.resource.RESTResource;
 
+/** Tests for output of complex OEntity structures to HAL JSON
+ */
 public class TestNesting {
 
 	/* shared type objects */
@@ -166,7 +168,9 @@ public class TestNesting {
 		subproperties.add(OProperties.string("HorseSize", size));
 		return OComplexObjects.create(ridesType, subproperties);
 	}
-	
+
+	/** A structure with a collection of a complex type in it
+	 */
 	@Test
 	public void testSerialiseNestedResource() throws Exception {
 
@@ -205,6 +209,12 @@ public class TestNesting {
 		assertEquals(expectedJSON, responseString);
 	}
 
+	/** A structure with a collection of a complex type in it
+	 *  This collection has only one element; the default behaviour
+	 *  as of Halbuilder 3 is to remove the js array when there is only
+	 *  one element. This checks that that behaviour is overridden and
+	 *  the array is still there.
+	 */
 	@Test
 	public void testSerialiseNestedResource1() throws Exception {
 

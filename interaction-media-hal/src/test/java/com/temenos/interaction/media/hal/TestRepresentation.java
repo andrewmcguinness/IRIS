@@ -39,6 +39,9 @@ import com.theoryinpractise.halbuilder.api.RepresentationFactory;
 import com.theoryinpractise.halbuilder.standard.StandardRepresentationFactory;
 import org.junit.Test;
 
+/** These tests are not actually testing IRIS code, they are verifying the behaviour
+ *  of the underlying halbuilder library.
+ */
 public class TestRepresentation {
 	private RepresentationFactory representationFactory = new StandardRepresentationFactory().withFlag(RepresentationFactory.SINGLE_ELEM_ARRAYS);
 
