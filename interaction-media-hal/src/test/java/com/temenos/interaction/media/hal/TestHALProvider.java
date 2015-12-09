@@ -61,6 +61,7 @@ import org.odata4j.edm.EdmEntityType;
 import org.odata4j.edm.EdmProperty;
 import org.odata4j.edm.EdmSimpleType;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.temenos.interaction.core.MultivaluedMapImpl;
 import com.temenos.interaction.core.command.CommandHelper;
 import com.temenos.interaction.core.entity.Entity;
@@ -90,6 +91,18 @@ public class TestHALProvider {
 		HALProvider hp = new HALProvider(mock(Metadata.class), mock(ResourceStateProvider.class));
 		assertEquals(-1, hp.getSize(null, null, null, null, null));
 	}
+
+	/** utility method to parse a json string for use in comparisons
+	 */
+	public Map parseJson(String json) throws IOException {
+		//converting json to Map
+		byte[] mapData = json.getBytes();
+		Map<String,Object> myMap = new HashMap<String, Object>();
+		
+		ObjectMapper objectMapper = new ObjectMapper();
+		myMap = objectMapper.readValue(mapData, HashMap.class);
+		return myMap;
+	}		
 
 	/*
 	 * Test the getSize operation of GET with this provider
@@ -436,7 +449,12 @@ public class TestHALProvider {
 		String expectedXML = "{\"_links\":{\"self\":{\"href\":\"/child/123\"},\"person\":[{\"href\":\"/parent/333\",\"name\":\"parent\",\"title\":\"parent\"}]},\"age\":\"2\",\"name\":\"noah\",\"_embedded\":{\"person\":[{\"_links\":{\"self\":{\"href\":\"/parent/333\"}},\"age\":\"30\",\"name\":\"aaron\"}]}}";
 		String responseString = new String(bos.toByteArray(), "UTF-8");
 		responseString = responseString.replaceAll(System.getProperty("line.separator"), "");
-		assertEquals(expectedXML, responseString);
+
+
+		Map<String,Object> expectedData = parseJson(expectedXML);
+		Map<String,Object> actualData   = parseJson(responseString);
+		
+		assertEquals(expectedData, actualData);
 	}
 
 	private EntityResource<OEntity> createEntityResourceWithSelfLink(OEntityKey entityKey, List<OProperty<?>> properties, String selfLink) {

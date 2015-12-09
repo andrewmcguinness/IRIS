@@ -69,6 +69,8 @@ import org.odata4j.edm.EdmProperty;
 import org.odata4j.edm.EdmSimpleType;
 import org.odata4j.edm.EdmType;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.temenos.interaction.core.MultivaluedMapImpl;
 import com.temenos.interaction.core.command.CommandHelper;
 import com.temenos.interaction.core.entity.Entity;
@@ -105,6 +107,16 @@ public class TestNesting {
 		EdmEntitySet dummy = createMockRidersEntitySet();
 	}
 
+	public Map parseJson(String json) throws IOException {
+		//converting json to Map
+		byte[] mapData = json.getBytes();
+		Map<String,Object> myMap = new HashMap<String, Object>();
+		
+		ObjectMapper objectMapper = new ObjectMapper();
+		myMap = objectMapper.readValue(mapData, HashMap.class);
+		return myMap;
+	}		
+	
 	private Metadata createMockRiderVocabMetadata() {
 		EntityMetadata vocs = new EntityMetadata("Riders");
 		Vocabulary vocId = new Vocabulary();
@@ -201,12 +213,15 @@ public class TestNesting {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		hp.writeTo(er, EntityResource.class, OEntity.class, null, MediaType.APPLICATION_HAL_JSON_TYPE, null, bos);
 
-		String expectedJSON = "{'_links':{'self':{'href':'http://www.temenos.com/rest.svc/'}},'age':'2','name':'noah','rides':[{'HorseSize':'12.2','HorseName':'Harley'},{'HorseSize':'13.2','HorseName':'Donny'}]}".replace('\'','\"');
+		String expectedJSON = "{'_links':{'self':{'href':'http://www.temenos.com/rest.svc/'}},'age':'2','name':'noah','rides':[{'HorseSize':'12.2','HorseName':'Harley'},{'HorseName':'Donny','HorseSize':'13.2'}]}".replace('\'','\"');
 
 		String responseString = makeSingleLineString(bos);
 		System.err.println(responseString);
 
-		assertEquals(expectedJSON, responseString);
+		Map<String,Object> expectedData = parseJson(expectedJSON);
+		Map<String,Object> actualData   = parseJson(responseString);
+
+		assertEquals(expectedData, actualData);
 	}
 
 	/** A structure with a collection of a complex type in it
@@ -250,6 +265,9 @@ public class TestNesting {
 		String responseString = makeSingleLineString(bos);
 		System.err.println(responseString);
 
-		assertEquals(expectedJSON, responseString);
+		Map<String,Object> expectedData = parseJson(expectedJSON);
+		Map<String,Object> actualData   = parseJson(responseString);
+
+		assertEquals(expectedData, actualData);
 	}
 }
