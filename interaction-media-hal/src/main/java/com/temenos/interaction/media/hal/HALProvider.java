@@ -273,40 +273,35 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 		return selfLink;
 	}
 
-	protected Object buildFromOObject(EntityMetadata entityMetadata, OObject object)
+	protected Object buildFromOObject(EntityMetadata entityMetadata, Object any)
 	{
-		if (object.getType().isSimple())
-			return ((OSimpleObject<Object>)object).getValue().toString();
-		else {
-			OComplexObject complex = (OComplexObject)object;
-			HashMap<String,Object> map = new HashMap<String,Object>();
-			for (OProperty property : complex.getProperties()) {
-				if (entityMetadata.getPropertyVocabulary(property.getName()) != null && property.getValue() != null) {
-					EdmType type = property.getType();
-					if ( type.isSimple() ) {
-						// call toString on object as a simple why of handling non simple types
-						map.put(property.getName(), property.getValue().toString());
-						logger.debug(String.format("add property %s = %s", property.getName(), property.getValue()));
-					} else if ( type instanceof EdmCollectionType ) {
-						EdmType elementType = ((EdmCollectionType)type).getItemType();
-						ArrayList builtList = new ArrayList<Object>();
-						OCollection<OObject> collection = (OCollection<OObject>)property.getValue();
-						for ( OObject each : collection ) {
-							builtList.add(buildFromOObject(entityMetadata, each));
-						}
-						map.put(property.getName(), builtList);
-				} else if ( type instanceof EdmComplexType ) {
-						map.put(property.getName(), buildFromOObject(entityMetadata, (OComplexObject)(property.getValue())));
-					} else {
-						logger.error(String.format("Unknown property with type %s not included in HAL response",type));
-					}					
+		if (any instanceof OObject) {
+			OObject object = (OObject)any;
+		   
+			if (object.getType().isSimple())
+				return ((OSimpleObject<Object>)object).getValue().toString();
+			else if (object instanceof OCollection) {
+				ArrayList builtList = new ArrayList<Object>();
+				OCollection<OObject> collection = (OCollection<OObject>)object;
+				for ( OObject each : collection ) {
+					builtList.add(buildFromOObject(entityMetadata, each));
 				}
-				else {
-					logger.debug(String.format("not adding property %s, value %s", property.getName(), property.getValue()));
+				return builtList;
+			} else {
+				OComplexObject complex = (OComplexObject)object;
+				HashMap<String,Object> map = new HashMap<String,Object>();
+				for (OProperty property : complex.getProperties()) {
+					if (entityMetadata.getPropertyVocabulary(property.getName()) != null && property.getValue() != null) {
+						map.put(property.getName(), buildFromOObject(entityMetadata, property.getValue()));
+					}
+					else {
+						logger.debug(String.format("not adding property %s, value %s", property.getName(), property.getValue()));
+					}
 				}
+				return map;
 			}
-			return map;
-		}
+		} else
+			return any.toString();
 	}
 
 	protected void buildFromOEntity(Map<String, Object> map, OEntity entity, String entityName) {
@@ -317,25 +312,7 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 		for (OProperty<?> property : entity.getProperties()) {
 			// add properties if they are present on the resolved entity
 			if (entityMetadata.getPropertyVocabulary(property.getName()) != null && property.getValue() != null) {
-				EdmType type = property.getType();
-				if ( type.isSimple() ) {
-					// call toString on object as a simple why of handling non simple types
-					map.put(property.getName(), property.getValue().toString());
-					logger.debug(String.format("add property %s = %s", property.getName(), property.getValue()));
-				} else if ( type instanceof EdmCollectionType ) {
-					EdmType elementType = ((EdmCollectionType)type).getItemType();
-					ArrayList builtList = new ArrayList<Object>();
-					OCollection<OObject> collection = (OCollection<OObject>)property.getValue();
-					for ( OObject each : collection ) {
-						builtList.add(buildFromOObject(entityMetadata, each));
-					}
-					map.put(property.getName(), builtList);
-					logger.debug(String.format("add collection property %s = %d items", property.getName(), builtList.size()));
-				} else if ( type instanceof EdmComplexType ) {
-					map.put(property.getName(), buildFromOObject(entityMetadata, (OComplexObject)property.getValue()));
-				} else {
-					logger.error(String.format("Unknown property with type %s not included in HAL response",type));
-				}					
+				map.put(property.getName(),buildFromOObject(entityMetadata, property.getValue()));
 			}
 			else {
 				logger.debug(String.format("not adding property %s, value %s", property.getName(), property.getValue()));
