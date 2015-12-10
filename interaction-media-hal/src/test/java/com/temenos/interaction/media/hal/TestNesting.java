@@ -37,6 +37,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -131,10 +132,10 @@ public class TestNesting {
 		vocs.setPropertyVocabulary("rides", vocRides);
 		Vocabulary vocHorseName = new Vocabulary();
 		vocHorseName.setTerm(new TermValueType(TermValueType.TEXT));
-		vocs.setPropertyVocabulary("HorseName", vocHorseName);
+		vocs.setPropertyVocabulary("HorseName", vocHorseName, Collections.enumeration(Collections.singletonList("rides")));
 		Vocabulary vocHorseSize = new Vocabulary();
 		vocHorseName.setTerm(new TermValueType(TermValueType.TEXT));
-		vocs.setPropertyVocabulary("HorseSize", vocHorseSize);
+		vocs.setPropertyVocabulary("HorseSize", vocHorseSize, Collections.enumeration(Collections.singletonList("rides")));
 		
 		Metadata metadata = new Metadata("Family");
 		metadata.setEntityMetadata(vocs);

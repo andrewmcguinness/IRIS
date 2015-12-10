@@ -280,10 +280,15 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 		return selfLink;
 	}
 
+	private String lengthenPrefix(String prefix, String extra) {
+		if (prefix.isEmpty()) return extra;
+		else return prefix + "." + extra;
+	}
+
 	/** transform OData4j object into String, Map or List
 	 *  Only properties defined in the entityMetadata vocabulary are included in transform output
 	 */
-	private Object buildFromOObject(EntityMetadata entityMetadata, Object any)
+	private Object buildFromOObject(EntityMetadata entityMetadata, String prefix, Object any)
 	{
 		if (any instanceof OObject) {
 			OObject object = (OObject)any;
@@ -294,7 +299,7 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 				ArrayList builtList = new ArrayList<Object>();
 				OCollection<OObject> collection = (OCollection<OObject>)object;
 				for ( OObject each : collection ) {
-					builtList.add(buildFromOObject(entityMetadata, each));
+					builtList.add(buildFromOObject(entityMetadata, prefix, each));
 				}
 				return builtList;
 			} else {
@@ -305,6 +310,7 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 					 * including the entity type prepended.
 					 */
 					String simpleName = property.getName();
+
 					if (!property.getType().isSimple()) {
 						String expectedPrefix = entityMetadata.getEntityName() + "_";
 						if (simpleName.startsWith(expectedPrefix)) {
@@ -313,13 +319,16 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 						} else
 							logger.info(String.format("property %s does not start with %s", simpleName, expectedPrefix));
 					}
-					
-					if (entityMetadata.getPropertyVocabulary(simpleName) != null
+					String qualifiedName = lengthenPrefix(prefix, simpleName);
+
+					if (entityMetadata.getPropertyVocabulary(qualifiedName) != null
 						&& property.getValue() != null) {
-						map.put(simpleName, buildFromOObject(entityMetadata, property.getValue()));
+						map.put(simpleName, buildFromOObject(entityMetadata,
+															 qualifiedName,
+															 property.getValue()));
 					} else {
 						logger.debug(String.format("not adding property %s [%s], value %s",
-												   property.getName(), simpleName, property.getValue()));
+												   property.getName(), qualifiedName, property.getValue()));
 					}
 				}
 				return map;
@@ -341,6 +350,7 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 					 * including the entity type prepended.
 					 */
 					String simpleName = property.getName();
+					
 					if (!property.getType().isSimple()) {
 						String expectedPrefix = entityMetadata.getEntityName() + "_";
 						if (simpleName.startsWith(expectedPrefix)) {
@@ -353,7 +363,7 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 					if (entityMetadata.getPropertyVocabulary(simpleName) != null
 
 				&& property.getValue() != null) {
-				map.put(simpleName, buildFromOObject(entityMetadata, property.getValue()));
+						map.put(simpleName, buildFromOObject(entityMetadata, simpleName, property.getValue()));
 			}
 			else {
 				logger.debug(String.format("not adding property %s, value %s",
