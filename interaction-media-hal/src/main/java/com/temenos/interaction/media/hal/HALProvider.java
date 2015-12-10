@@ -301,12 +301,25 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 				OComplexObject complex = (OComplexObject)object;
 				HashMap<String,Object> map = new HashMap<String,Object>();
 				for (OProperty property : complex.getProperties()) {
-					if (entityMetadata.getPropertyVocabulary(property.getName()) != null
+					/* It looks like for complex properties, the OProperty comes with a name
+					 * including the entity type prepended.
+					 */
+					String simpleName = property.getName();
+					if (!property.getType().isSimple()) {
+						String expectedPrefix = entityMetadata.getEntityName() + "_";
+						if (simpleName.startsWith(expectedPrefix)) {
+							simpleName = simpleName.substring(expectedPrefix.length());
+							logger.debug(String.format("property lookup: %s -> %s", property.getName(), simpleName));
+						} else
+							logger.info(String.format("property %s does not start with %s", simpleName, expectedPrefix));
+					}
+					
+					if (entityMetadata.getPropertyVocabulary(simpleName) != null
 						&& property.getValue() != null) {
-						map.put(property.getName(), buildFromOObject(entityMetadata, property.getValue()));
+						map.put(simpleName, buildFromOObject(entityMetadata, property.getValue()));
 					} else {
-						logger.debug(String.format("not adding property %s, value %s",
-												   property.getName(), property.getValue()));
+						logger.debug(String.format("not adding property %s [%s], value %s",
+												   property.getName(), simpleName, property.getValue()));
 					}
 				}
 				return map;
@@ -324,9 +337,23 @@ public class HALProvider implements MessageBodyReader<RESTResource>, MessageBody
 
 		for (OProperty<?> property : entity.getProperties()) {
 			// add properties if they are present on the resolved entity
-			if (entityMetadata.getPropertyVocabulary(property.getName()) != null
+					/* It looks like for complex properties, the OProperty comes with a name
+					 * including the entity type prepended.
+					 */
+					String simpleName = property.getName();
+					if (!property.getType().isSimple()) {
+						String expectedPrefix = entityMetadata.getEntityName() + "_";
+						if (simpleName.startsWith(expectedPrefix)) {
+							simpleName = simpleName.substring(expectedPrefix.length());
+							logger.debug(String.format("property lookup: %s -> %s", property.getName(), simpleName));
+						} else
+							logger.info(String.format("property %s does not start with %s", simpleName, expectedPrefix));
+					}
+					
+					if (entityMetadata.getPropertyVocabulary(simpleName) != null
+
 				&& property.getValue() != null) {
-				map.put(property.getName(),buildFromOObject(entityMetadata, property.getValue()));
+				map.put(simpleName, buildFromOObject(entityMetadata, property.getValue()));
 			}
 			else {
 				logger.debug(String.format("not adding property %s, value %s",

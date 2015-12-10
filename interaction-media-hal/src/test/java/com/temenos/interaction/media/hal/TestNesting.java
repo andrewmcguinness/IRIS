@@ -199,7 +199,7 @@ public class TestNesting {
 			add(makeHorse("Donny", "13.2")).
 			build();
 
-		properties.add(OProperties.collection("rides", ridesCollectionType, rides));
+		properties.add(OProperties.collection("Riders_rides", ridesCollectionType, rides));
 
 
 		OEntity entity = OEntities.create(setType, entityKey, properties, new ArrayList<OLink>());
@@ -246,7 +246,7 @@ public class TestNesting {
 			//			add(makeHorse("Donny", "13.2")).
 			build();
 
-		properties.add(OProperties.collection("rides", ridesCollectionType, rides));
+		properties.add(OProperties.collection("Riders_rides", ridesCollectionType, rides));
 
 
 		OEntity entity = OEntities.create(setType, entityKey, properties, new ArrayList<OLink>());
