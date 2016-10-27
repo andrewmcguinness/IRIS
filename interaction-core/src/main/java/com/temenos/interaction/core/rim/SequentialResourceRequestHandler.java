@@ -81,7 +81,7 @@ public class SequentialResourceRequestHandler implements ResourceRequestHandler 
 				
 				for (String key : transitionProperties.keySet()) {
 					if (transitionProperties.get(key) != null) {
-						newPathParameters.add(key, transitionProperties.get(key).toString());
+						newPathParameters.putSingle(key, transitionProperties.get(key).toString());
 					}
 				}				
 			}
@@ -97,7 +97,10 @@ public class SequentialResourceRequestHandler implements ResourceRequestHandler 
 				
 				for (String key : transitionProperties.keySet()) {
 					if (transitionProperties.get(key) != null) {
-						newQueryParameters.add(key, transitionProperties.get(key).toString());
+						/* Adding transition properties to both query parameters and path parameters,
+						 * as they should take priority over either */
+						newQueryParameters.putSingle(key, transitionProperties.get(key).toString());
+						newPathParameters.putSingle(key, transitionProperties.get(key).toString());
 					}
 				}
 			}
