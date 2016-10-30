@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
  * The &quot; and " are removed from the values prior to comparison.
  * The Values are trimmed prior to comparison
  * Example : "  hello" = 'hello  ' return true.
+ * (Note therefore "onetwo" contains " " returns true like "one two" contains " ")
  * 
  * @author taubert
  * 
@@ -48,7 +49,7 @@ public class MatchCommand implements InteractionCommand {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MatchCommand.class);
 
 	/*
-	 * important : the biggers (in chars) first
+	 * important : the longer (in chars) first
 	 */
 	private static final String[] supportedComparators = new String[]{"startsWith", "endsWith", "contains", "<=", ">=", "!=", "<", ">", "="};
 
@@ -83,6 +84,7 @@ public class MatchCommand implements InteractionCommand {
 					left = sExpression.substring(0,pos);
 					right = sExpression.substring(pos + sOneComparator.length());
 					comparator = sOneComparator;
+					break;
 				}
 			}
 			
@@ -130,11 +132,12 @@ public class MatchCommand implements InteractionCommand {
 		}
 	}	
 	
-	private String resolveVariable(InteractionContext ctx, String s){
-		if (s == null){
+	private String resolveVariable(InteractionContext ctx, String var){
+		if (var == null){
 			return null;
 		}
-		String ret = s.trim();
+		String s = var.trim();
+		String ret = s;
 		
 		if (s.startsWith("'") && s.endsWith("'")){
 			ret = s.substring(1, s.length()-1).trim();

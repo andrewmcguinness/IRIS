@@ -113,7 +113,7 @@ public class TestMatchCommand {
 		assertEquals(InteractionCommand.Result.SUCCESS, result);
 	}
 
-	@Test @Ignore
+	@Test 
 	public void testSpaces() throws InteractionException {
 		setExpression("{Variable} = 'Value'");
 		InteractionCommand.Result result = cmd.execute(ctx);
@@ -122,7 +122,7 @@ public class TestMatchCommand {
 
 	/* != is broken, because it comes after = in the list, and there is
      * no break in the loop */
-	@Test @Ignore
+	@Test 
 	public void testNotEquals() throws InteractionException {
 		setExpression("{Variable}!='Wrong'");
 		InteractionCommand.Result result = cmd.execute(ctx);
@@ -143,14 +143,14 @@ public class TestMatchCommand {
 		assertEquals(InteractionCommand.Result.SUCCESS, result);
 	}
 
-	@Test @Ignore
+	@Test 
 	public void testStartsWithLiteral() throws InteractionException {
 		setExpression("'Value' startsWith 'Val'");
 		InteractionCommand.Result result = cmd.execute(ctx);
 		assertEquals(InteractionCommand.Result.SUCCESS, result);
 	}
 
-	@Test @Ignore
+	@Test 
 	public void testStartsWithSpace() throws InteractionException {
 		setExpression("{Variable} startsWith 'Val'");
 		InteractionCommand.Result result = cmd.execute(ctx);
