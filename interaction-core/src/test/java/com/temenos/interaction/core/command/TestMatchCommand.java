@@ -156,4 +156,11 @@ public class TestMatchCommand {
 		InteractionCommand.Result result = cmd.execute(ctx);
 		assertEquals(InteractionCommand.Result.SUCCESS, result);
 	}
+
+	@Test
+	public void testError() throws InteractionException {
+		setExpression("Invalid expression");
+		InteractionCommand.Result result = cmd.execute(ctx);
+		assertEquals(InteractionCommand.Result.FAILURE, result);
+	}
 }

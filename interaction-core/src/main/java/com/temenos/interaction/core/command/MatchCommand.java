@@ -53,6 +53,78 @@ public class MatchCommand implements InteractionCommand {
 	 */
 	private static final String[] supportedComparators = new String[]{"startsWith", "endsWith", "contains", "<=", ">=", "!=", "<", ">", "="};
 
+	/* Look up a parameter in the context.
+	 * Override this to change lookup behaviour
+	 * Returns first value in Path multimap, and if that fails
+	 * then first value in Query multimap
+	 */
+	protected String lookup(InteractionContext ctx, String variable) {
+		String value = ctx.getPathParameters().getFirst(variable);
+		if (value == null) {
+			value = ctx.getQueryParameters().getFirst(variable);
+		}
+		return value;
+	}
+
+	/*
+	 * Evaluate an expression. override this to modify or extend comparisons
+	 */
+	protected boolean evaluate(InteractionContext ctx, String expression) {
+		if (expression == null){
+			throw new IllegalArgumentException("null expression passed to MatchCommand");
+		}
+
+	    /*
+	     * So we have an expression.
+	     * Currently, only simple expression are valid (=, >, <, <=, >=, !=, startsWith, endsWith, contains)
+	     */
+			
+		String left = null;
+		String right = null;
+		String comparator = null;
+		for (String sOneComparator : supportedComparators){
+			int pos = expression.indexOf(sOneComparator);
+			if (pos > 0){
+				left = expression.substring(0,pos);
+				right = expression.substring(pos + sOneComparator.length());
+				comparator = sOneComparator;
+				break;
+			}
+		}
+			
+		if (comparator == null){
+			throw new IllegalArgumentException("Wrong expression passed to MatchCommand. Only simple expression are valid (=, >, <, <=, >=, !=, startsWith, endsWith, contains) ");
+		}
+			
+		left = resolveVariable(ctx, left);
+		right = resolveVariable(ctx, right);
+
+		/*
+		 * Do the comparisons.
+		 */
+		boolean bResult = false;
+		if ("=".equals(comparator)){
+			bResult = left.equals(right);
+		}else if (">".equals(comparator)){
+			bResult = left.compareTo(right) > 0;
+		}else if ("<".equals(comparator)){
+			bResult = left.compareTo(right) < 0;
+		}else if (">=".equals(comparator)){
+			bResult = left.compareTo(right) >= 0;
+		}else if ("<=".equals(comparator)){
+			bResult = left.compareTo(right) <= 0;
+		}else if ("!=".equals(comparator)){
+			bResult = !left.equals(right);
+		}else if ("startsWith".equals(comparator)){
+			bResult = left.startsWith(right);
+		}else if ("endsWith".equals(comparator)){
+			bResult = left.endsWith(right);
+		}else if ("contains".equals(comparator)){
+			bResult = left.contains(right);
+		}
+		return bResult;
+	}
+	
 	@Override
 	public Result execute(InteractionContext ctx) throws InteractionException {
 		/*
@@ -65,62 +137,8 @@ public class MatchCommand implements InteractionCommand {
 
 			Properties properties = ctx.getCurrentState().getViewAction().getProperties();
 			String sExpression = properties.getProperty("Expression");
-			if (sExpression == null){
-				LOGGER.error("null expression passed to MatchCommand");
-				return Result.FAILURE;
-			}
 
-			/*
-			 * So we have an expression.
-			 * Currently, only simple expression are valid (=, >, <, <=, >=, !=, startsWith, endsWith, contains)
-			 */
-			
-			String left = null;
-			String right = null;
-			String comparator = null;
-			for (String sOneComparator : supportedComparators){
-				int pos = sExpression.indexOf(sOneComparator);
-				if (pos > 0){
-					left = sExpression.substring(0,pos);
-					right = sExpression.substring(pos + sOneComparator.length());
-					comparator = sOneComparator;
-					break;
-				}
-			}
-			
-			if (comparator == null){
-				LOGGER.error("Wrong expression passed to MatchCommand. Only simple expression are valid (=, >, <, <=, >=, !=, startsWith, endsWith, contains) ");
-				return Result.FAILURE;
-			}
-			
-			left = resolveVariable(ctx, left);
-			right = resolveVariable(ctx, right);
-
-			/*
-			 * Do the comparisons.
-			 */
-			boolean bResult = false;
-			if ("=".equals(comparator)){
-				bResult = left.equals(right);
-			}else if (">".equals(comparator)){
-				bResult = left.compareTo(right) > 0;
-			}else if ("<".equals(comparator)){
-				bResult = left.compareTo(right) < 0;
-			}else if (">=".equals(comparator)){
-				bResult = left.compareTo(right) >= 0;
-			}else if ("<=".equals(comparator)){
-				bResult = left.compareTo(right) <= 0;
-			}else if ("!=".equals(comparator)){
-				bResult = !left.equals(right);
-			}else if ("startsWith".equals(comparator)){
-				bResult = left.startsWith(right);
-			}else if ("endsWith".equals(comparator)){
-				bResult = left.endsWith(right);
-			}else if ("contains".equals(comparator)){
-				bResult = left.contains(right);
-			}
-			
-			if (bResult){
+			if (evaluate(ctx, sExpression)){
 				return Result.SUCCESS;
 			}else{
 				return Result.FAILURE;
@@ -131,8 +149,9 @@ public class MatchCommand implements InteractionCommand {
 			return Result.FAILURE;
 		}
 	}	
-	
-	private String resolveVariable(InteractionContext ctx, String var){
+
+	/* Resolve an operand, which may be a variable */
+	protected String resolveVariable(InteractionContext ctx, String var){
 		if (var == null){
 			return null;
 		}
@@ -146,10 +165,7 @@ public class MatchCommand implements InteractionCommand {
 				ret = s.substring(1, s.length()-1).trim();
 			}else if (s.startsWith("{") && s.endsWith("}")){
 				s = s.substring(1, s.length()-1).trim();
-				ret = ctx.getPathParameters().getFirst(s);
-				if (ret == null) {
-					ret = ctx.getQueryParameters().getFirst(s);
-				}
+				ret = lookup(ctx, s);
 				if (ret == null){
 					ret = s; // the variable without the { } 
 				}else{
