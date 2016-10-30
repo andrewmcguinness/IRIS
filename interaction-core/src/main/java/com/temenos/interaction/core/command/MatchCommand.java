@@ -53,6 +53,11 @@ public class MatchCommand implements InteractionCommand {
 	 */
 	private static final String[] supportedComparators = new String[]{"startsWith", "endsWith", "contains", "<=", ">=", "!=", "<", ">", "="};
 
+	/* The comparators to be used by the parser */
+	protected String[] comparators() {
+		return supportedComparators;
+	}
+	
 	/* Look up a parameter in the context.
 	 * Override this to change lookup behaviour
 	 * Returns first value in Path multimap, and if that fails
@@ -66,6 +71,31 @@ public class MatchCommand implements InteractionCommand {
 		return value;
 	}
 
+	/* Evaluation of a simple expression, after parsing */
+	protected boolean simpleExpression(String op, String left, String right) {
+		boolean bResult = false;
+		if ("=".equals(op)){
+			bResult = left.equals(right);
+		}else if (">".equals(op)){
+			bResult = left.compareTo(right) > 0;
+		}else if ("<".equals(op)){
+			bResult = left.compareTo(right) < 0;
+		}else if (">=".equals(op)){
+			bResult = left.compareTo(right) >= 0;
+		}else if ("<=".equals(op)){
+			bResult = left.compareTo(right) <= 0;
+		}else if ("!=".equals(op)){
+			bResult = !left.equals(right);
+		}else if ("startsWith".equals(op)){
+			bResult = left.startsWith(right);
+		}else if ("endsWith".equals(op)){
+			bResult = left.endsWith(right);
+		}else if ("contains".equals(op)){
+			bResult = left.contains(right);
+		}
+		return bResult;
+	}
+	
 	/*
 	 * Evaluate an expression. override this to modify or extend comparisons
 	 */
@@ -82,7 +112,7 @@ public class MatchCommand implements InteractionCommand {
 		String left = null;
 		String right = null;
 		String comparator = null;
-		for (String sOneComparator : supportedComparators){
+		for (String sOneComparator : comparators()){
 			int pos = expression.indexOf(sOneComparator);
 			if (pos > 0){
 				left = expression.substring(0,pos);
@@ -93,7 +123,7 @@ public class MatchCommand implements InteractionCommand {
 		}
 			
 		if (comparator == null){
-			throw new IllegalArgumentException("Wrong expression passed to MatchCommand. Only simple expression are valid (=, >, <, <=, >=, !=, startsWith, endsWith, contains) ");
+			throw new IllegalArgumentException("No comparsion operator recognised in expression passed to MatchCommand");
 		}
 			
 		left = resolveVariable(ctx, left);
@@ -102,27 +132,7 @@ public class MatchCommand implements InteractionCommand {
 		/*
 		 * Do the comparisons.
 		 */
-		boolean bResult = false;
-		if ("=".equals(comparator)){
-			bResult = left.equals(right);
-		}else if (">".equals(comparator)){
-			bResult = left.compareTo(right) > 0;
-		}else if ("<".equals(comparator)){
-			bResult = left.compareTo(right) < 0;
-		}else if (">=".equals(comparator)){
-			bResult = left.compareTo(right) >= 0;
-		}else if ("<=".equals(comparator)){
-			bResult = left.compareTo(right) <= 0;
-		}else if ("!=".equals(comparator)){
-			bResult = !left.equals(right);
-		}else if ("startsWith".equals(comparator)){
-			bResult = left.startsWith(right);
-		}else if ("endsWith".equals(comparator)){
-			bResult = left.endsWith(right);
-		}else if ("contains".equals(comparator)){
-			bResult = left.contains(right);
-		}
-		return bResult;
+		return simpleExpression(comparator, left, right);
 	}
 	
 	@Override
