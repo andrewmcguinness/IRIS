@@ -57,6 +57,32 @@ public class MatchCommand implements InteractionCommand {
 	protected String[] comparators() {
 		return supportedComparators;
 	}
+
+	public interface Variables {
+		public Object get(String name);
+		public String getString(String name);
+	}
+	protected class Lookup implements Variables {
+		private InteractionContext ctx;
+		public Lookup(InteractionContext context) {
+			ctx = context;
+		}
+		public String getString(String name) {
+			String value = ctx.getPathParameters().getFirst(name);
+			if (value == null) {
+				value = ctx.getQueryParameters().getFirst(name);
+			}
+			return value;
+		}
+		public Object get(String name) { return getString(name); }
+	}
+
+	/* Return an object to use as a scope for looking up variables
+	 * Override this to change lookup behaviour
+	 */
+	protected Variables setupVariables(InteractionContext ctx) {
+		return new Lookup(ctx);
+	}
 	
 	/* Look up a parameter in the context.
 	 * Override this to change lookup behaviour
@@ -73,6 +99,7 @@ public class MatchCommand implements InteractionCommand {
 
 	/* Evaluation of a simple expression, after parsing */
 	protected boolean simpleExpression(String op, String left, String right) {
+		LOGGER.debug("[" + left + "] \"" + op + "\" [" + right + "]");
 		boolean bResult = false;
 		if ("=".equals(op)){
 			bResult = left.equals(right);
@@ -99,7 +126,7 @@ public class MatchCommand implements InteractionCommand {
 	/*
 	 * Evaluate an expression. override this to modify or extend comparisons
 	 */
-	protected boolean evaluate(InteractionContext ctx, String expression) {
+	protected boolean evaluate(Variables scope, String expression) {
 		if (expression == null){
 			throw new IllegalArgumentException("null expression passed to MatchCommand");
 		}
@@ -123,11 +150,11 @@ public class MatchCommand implements InteractionCommand {
 		}
 			
 		if (comparator == null){
-			throw new IllegalArgumentException("No comparsion operator recognised in expression passed to MatchCommand");
+			throw new IllegalArgumentException("No comparison operator recognised in expression passed to MatchCommand");
 		}
 			
-		left = resolveVariable(ctx, left);
-		right = resolveVariable(ctx, right);
+		left = resolveVariable(scope, left);
+		right = resolveVariable(scope, right);
 
 		/*
 		 * Do the comparisons.
@@ -137,31 +164,31 @@ public class MatchCommand implements InteractionCommand {
 	
 	@Override
 	public Result execute(InteractionContext ctx) throws InteractionException {
-		/*
-		 * Few assertions first ...
-		 */
+		String sExpression = "unset";
 		try {
 			assert ctx != null;
 			assert ctx.getCurrentState() != null;
 			assert ctx.getCurrentState().getEntityName() != null && !"".equals(ctx.getCurrentState().getEntityName());
 
 			Properties properties = ctx.getCurrentState().getViewAction().getProperties();
-			String sExpression = properties.getProperty("Expression");
+			sExpression = properties.getProperty("Expression");
 
-			if (evaluate(ctx, sExpression)){
+			Variables scope = setupVariables(ctx);
+
+			if (evaluate(scope, sExpression)){
 				return Result.SUCCESS;
 			}else{
 				return Result.FAILURE;
 			}
 		} catch (Exception e) {
-		    LOGGER.error("There was an issue while evaluating the expression", e);
+		    LOGGER.error("There was an issue while evaluating the expression (" + sExpression + ")", e);
 		    
 			return Result.FAILURE;
 		}
 	}	
 
 	/* Resolve an operand, which may be a variable */
-	protected String resolveVariable(InteractionContext ctx, String var){
+	protected String resolveVariable(Variables scope, String var){
 		if (var == null){
 			return null;
 		}
@@ -175,7 +202,7 @@ public class MatchCommand implements InteractionCommand {
 				ret = s.substring(1, s.length()-1).trim();
 			}else if (s.startsWith("{") && s.endsWith("}")){
 				s = s.substring(1, s.length()-1).trim();
-				ret = lookup(ctx, s);
+				ret = scope.getString(s);
 				if (ret == null){
 					ret = s; // the variable without the { } 
 				}else{
